@@ -20,6 +20,7 @@ I enjoy building single-file applications that run anywhere. Here is what I’ve
 
 | Project | What is it? | Link |
 | :--- | :--- | :--- |
+| **Curriculum Vitae** | Hire me. | [](https://jomerbiason.github.io/fuel-inventory-management-system-and-variance-checker/) |
 | **Fuel IMS** | Enterprise-grade inventory & variance checker for fuel stations. | [Access Tool](https://jomerbiason.github.io/fuel-inventory-management-system-and-variance-checker/) |
 | **GridCrypt** | A dark, 8-bit procedural roguelite for mobile. | [Play Game](https://jomerbiason.github.io/grid-crypt/) |
 | **Minesweeper** | A polished, classic game with custom difficulty settings. | [Play Game](https://jomerbiason.github.io/minesweeper-classic/) |
@@ -34,7 +35,6 @@ I graduated with a **Bachelor of Science in Computer Science** from Cavite State
 ## 📄 My Professional Portfolio
 I’ve built a dedicated website to showcase my background, certifications, and complete CV details.
 
-* 🌐 **[Visit My Portfolio Website](https://jomerbiason.github.io)**
 * 📥 **[Download My Curriculum Vitae (PDF)](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
 
 ---
