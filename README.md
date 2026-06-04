@@ -23,7 +23,6 @@ I enjoy building single-file applications that run anywhere. Here is what I’ve
 
 | Project | What is it? | Link |
 | :--- | :--- | :--- |
-| **Live Site** | Work experience, certifications, and background in details. | [Explore](https://jomerbiason.github.io/curriculum-vitae/) |
 | **Fuel IMS** | Enterprise-grade inventory & variance checker for fuel stations. | [Access Tool](https://jomerbiason.github.io/fuel-inventory-management-system-and-variance-checker/) |
 | **GridCrypt** | A dark, 8-bit procedural roguelite for mobile. | [Play Game](https://jomerbiason.github.io/grid-crypt/) |
 | **Minesweeper** | A polished, classic game with custom difficulty settings. | [Play Game](https://jomerbiason.github.io/minesweeper-classic/) |
