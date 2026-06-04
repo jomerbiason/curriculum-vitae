@@ -4,17 +4,8 @@ Welcome to my corner of the web! I’m a Computer Science graduate and a tech en
 
 Whether it's managing fuel inventory for retail stations or crafting a classic game of Minesweeper, I’m always excited to learn something new and build projects that are both functional and fun.
 
----
-
 > ⭐ **[Explore My Portfolio Website](https://jomerbiason.github.io/curriculum-vitae/)**  
 > *Come take a tour of my journey, and see what I've been building!*
-
----
-
-💡 **Prefer the traditional route?**  
-If you're in a hurry and just need the details, you can grab a copy of my resume right here:
-
-* 📥 **[Download My Curriculum Vitae (PDF)](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
 
 ---
 
@@ -49,5 +40,10 @@ I'm always happy to chat about tech, coding, or just life in general.
 
 * **Email:** jomerbiason@gmail.com
 * **LinkedIn:** [linkedin.com/in/jomer-biason](https://www.linkedin.com/in/jomer-biason-6731b3245/)
+
+If you're in a hurry and just need the details, you can grab a copy of my resume right here:
+
+* 📥 **[Download My Curriculum Vitae (PDF)](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
+
 
 *Thanks for stopping by! I hope you have a fantastic day!* 😊
