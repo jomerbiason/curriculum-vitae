@@ -1,6 +1,6 @@
 # 👋 Hello there! I'm Jomer Biason
 
-Welcome to my corner of the web! I’m a Computer Science graduate and a tech enthusiast based in the Philippines. I love tinkering with code, solving technical puzzles, and building tools that make daily life and work a little bit easier.
+Welcome to my corner of the web! I’m a Computer Science graduate and a tech enthusiast based in the Philippines. I love tinkering with code, solving technical puzzles, and building tools that make daily life—and work—a little bit easier.
 
 Whether it's managing fuel inventory for retail stations or crafting a classic game of Minesweeper, I’m always excited to learn something new and build projects that are both functional and fun.
 
@@ -31,10 +31,11 @@ I graduated with a **Bachelor of Science in Computer Science** from Cavite State
 
 ---
 
-## 📄 Want to know more?
-If you'd like to check out my full background, technical certifications, and work experience, please feel free to grab my CV:
+## 📄 My Professional Portfolio
+I’ve built a dedicated website to showcase my background, certifications, and complete CV details.
 
-👉 **[Download My Curriculum Vitae](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
+* 🌐 **[Visit My Portfolio Website](https://jomerbiason.github.io)**
+* 📥 **[Download My Curriculum Vitae (PDF)](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
 
 ---
 
