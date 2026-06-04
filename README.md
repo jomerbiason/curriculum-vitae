@@ -6,6 +6,18 @@ Whether it's managing fuel inventory for retail stations or crafting a classic g
 
 ---
 
+> ⭐ **[Explore My Portfolio Website](https://jomerbiason.github.io/curriculum-vitae/)**  
+> *Come take a tour of my journey, and see what I've been building!*
+
+---
+
+💡 **Prefer the traditional route?**  
+If you're in a hurry and just need the details, you can grab a copy of my resume right here:
+
+* 📥 **[Download My Curriculum Vitae (PDF)](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
+
+---
+
 ## 🛠️ My Toolbox
 I’m a big fan of **Vanilla Development**. I love keeping things lightweight, fast, and dependency-free.
 
@@ -29,13 +41,6 @@ I enjoy building single-file applications that run anywhere. Here is what I’ve
 
 ## 🎓 Education & Background
 I graduated with a **Bachelor of Science in Computer Science** from Cavite State University. My journey has taken me from hands-on IT support to building custom web solutions. I’m always looking to grow, help my team, and contribute to meaningful projects!
-
----
-
-## 📄 My Professional Portfolio
-I’ve built a dedicated website to showcase my background, certifications, and complete CV details.
-
-* 📥 **[Download My Curriculum Vitae (PDF)](https://github.com/jomerbiason/curriculum-vitae/raw/main/JomerAntoniegoBiason_CurriculumVitae.pdf)**
 
 ---
 
