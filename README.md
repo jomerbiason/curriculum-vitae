@@ -1,6 +1,6 @@
 # 👋 Hello there! I'm Jomer Biason
 
-Welcome to my corner of the web! I’m a Computer Science graduate and a tech enthusiast based in the Philippines. I love tinkering with code, solving technical puzzles, and building tools that make daily life—and work—a little bit easier.
+Welcome to my corner of the web! I’m a Computer Science graduate and a tech enthusiast based in the Philippines. I love tinkering with code, solving technical puzzles, and building tools that make daily life-and work-a little bit easier.
 
 Whether it's managing fuel inventory for retail stations or crafting a classic game of Minesweeper, I’m always excited to learn something new and build projects that are both functional and fun.
 
