@@ -170,10 +170,7 @@ body {
 
 /* ── CLICK RIPPLE ZONE ── */
 #bg-click-zone {
-  position: fixed;
-  inset: 56px 0 160px 0;
-  z-index: 3;
-  cursor: pointer;
+  display: none;
 }
 
 /* ── GAME UI ── */
@@ -200,20 +197,31 @@ body {
 /* ── GAME PROMPT ── */
 #game-prompt {
   position: fixed;
-  bottom: 56px;
+  bottom: 62px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
+  z-index: 50;
   font-family: 'Press Start 2P', monospace;
   font-size: 7px;
   color: #fff;
-  text-shadow: 1px 1px 0 #000;
-  background: rgba(0,0,0,0.5);
-  border: 2px solid var(--border);
-  padding: 4px 10px;
-  animation: blink 2s step-start infinite;
-  pointer-events: none;
+  text-shadow: 1px 1px 0 #000, 0 0 10px #FFD700;
+  background: rgba(0,0,0,0.72);
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 12px #FFD700, inset 0 0 8px rgba(255,215,0,0.15);
+  padding: 8px 16px;
+  animation: promptPulse 1.4s ease-in-out infinite;
+  pointer-events: all;
+  cursor: pointer;
   white-space: nowrap;
+  user-select: none;
+}
+#game-prompt:hover {
+  background: rgba(30,20,0,0.92);
+  box-shadow: 0 0 22px #FFD700, inset 0 0 12px rgba(255,215,0,0.25);
+}
+@keyframes promptPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px #FFD700, inset 0 0 8px rgba(255,215,0,0.15); }
+  50%       { opacity: 0.7; box-shadow: 0 0 4px #FFD700, inset 0 0 4px rgba(255,215,0,0.05); }
 }
 
 /* ── ATTACK FLASH ── */
@@ -436,7 +444,7 @@ footer a { color: var(--link); }
 </div>
 
 <!-- GAME PROMPT -->
-<div id="game-prompt">✦ CLICK ANYWHERE TO BEGIN THE ADVENTURE ✦</div>
+<button id="game-prompt" aria-label="Start the minigame">▶ CLICK HERE TO BEGIN THE ADVENTURE ◀</button>
 
 <!-- ATTACK FLASH -->
 <div id="attack-flash"></div>
@@ -1095,7 +1103,6 @@ function createFloatText(x, y, text, color) {
   const killDisplay = document.getElementById('kill-display');
   const bestDisplay = document.getElementById('best-display');
   const attackFlash = document.getElementById('attack-flash');
-  const bgZone = document.getElementById('bg-click-zone');
 
   const SCALE = 3; // pixel scale factor
   const SPR = 16;  // sprite size in pixels
@@ -1136,12 +1143,14 @@ function createFloatText(x, y, text, color) {
   function resize() {
     W = canvas.width = window.innerWidth;
     H = canvas.height = 160;
-    // Ground level: sprite feet at H - 48px (ground stripe)
-    champ.y = H - DRAW_SIZE - 4;
-    dummy.x = 60;
-    dummy.y = H - DRAW_SIZE - 4;
+    // Ground level: sprite feet sit just above ground stripe (48px)
+    const groundY = H - DRAW_SIZE - 52;
+    champ.y = groundY;
+    dummy.x = 110;
+    dummy.y = groundY;
     if(!gameActive) {
-      champ.x = 60 - DRAW_SIZE - 8;
+      // Champion stands left of dummy, facing it (facing right)
+      champ.x = dummy.x - DRAW_SIZE - 6;
       champ.state = 'idle';
     }
   }
@@ -1156,9 +1165,10 @@ function createFloatText(x, y, text, color) {
     floatTexts = [];
     spawnTimer = 120;
     spawnInterval = 240;
+    const groundY = H - DRAW_SIZE - 52;
     champ.state = 'running';
-    champ.x = 60;
-    champ.y = H - DRAW_SIZE - 4;
+    champ.x = dummy.x;
+    champ.y = groundY;
     champ.targetX = W * 0.45;
     champ.invincible = 0;
     champ.slowTimer = 0;
@@ -1177,9 +1187,11 @@ function createFloatText(x, y, text, color) {
     setTimeout(()=>{
       gameUI.classList.remove('active');
       gamePrompt.style.display = '';
-      gamePrompt.textContent = `✦ DEFEATED! BEST: ${bestKills} · CLICK TO RETRY ✦`;
+      gamePrompt.textContent = `▶ DEFEATED! BEST: ${bestKills} · CLICK TO RETRY ◀`;
+      const groundY = H - DRAW_SIZE - 52;
       champ.state = 'idle';
-      champ.x = 60 - DRAW_SIZE - 8;
+      champ.x = dummy.x - DRAW_SIZE - 6;
+      champ.y = groundY;
       enemies = [];
     }, 2500);
   }
@@ -1194,10 +1206,11 @@ function createFloatText(x, y, text, color) {
   function spawnEnemy() {
     const types = ['slime','skeleton'];
     const type = types[Math.floor(Math.random()*types.length)];
+    const groundY = H - DRAW_SIZE - 52;
     enemies.push({
       type,
       x: W + DRAW_SIZE,
-      y: H - DRAW_SIZE - 4,
+      y: groundY,
       vx: -(1.2 + Math.random()*0.8 + kills*0.04),
       frame: 0,
       frameTimer: 0,
@@ -1447,24 +1460,9 @@ function createFloatText(x, y, text, color) {
     requestAnimationFrame(loop);
   }
 
-  // ── CLICK / TOUCH TRIGGER ──
-  function handleClick(e) {
-    // Don't trigger if clicking on a link/button
-    if(e.target.closest('a,button,.panel,.chest,.cert-card,header,footer,nav')) return;
-    if(!gameActive) {
-      startGame();
-    }
-  }
-
-  bgZone.addEventListener('click', handleClick);
-  bgZone.addEventListener('touchstart', (e) => {
-    if(!gameActive) { e.preventDefault(); startGame(); }
-  }, { passive: false });
-
-  // Also allow clicking on the main background
-  document.addEventListener('click', (e) => {
-    if(e.target === document.body || e.target === document.documentElement) handleClick(e);
-  });
+  // ── GAME PROMPT BUTTON — direct, reliable click ──
+  gamePrompt.addEventListener('click', () => startGame());
+  gamePrompt.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
 
   resize();
   window.addEventListener('resize', resize);
@@ -1474,5 +1472,3 @@ function createFloatText(x, y, text, color) {
 </script>
 </body>
 </html>
-
-
