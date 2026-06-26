@@ -20,7 +20,6 @@
   --day-header: #3d2b1f;
   --day-sun:    #FFD700;
   --day-link:   #1a5276;
-
   --night-sky:    #0d1b2a;
   --night-ground: #1a3a1a;
   --night-text:   #e8f4e8;
@@ -30,8 +29,6 @@
   --night-header: #001a0d;
   --night-moon:   #ddeeff;
   --night-link:   #66ffcc;
-
-  /* active theme (defaults to day) */
   --sky:    var(--day-sky);
   --ground: var(--day-ground);
   --text:   var(--day-text);
@@ -54,7 +51,6 @@
   --cel:    var(--night-moon);
 }
 
-/* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -68,12 +64,11 @@ body {
   overflow-x: hidden;
 }
 
-/* ── PIXEL SCROLLBAR ── */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--panel); }
 ::-webkit-scrollbar-thumb { background: var(--border); image-rendering: pixelated; }
 
-/* ── PARALLAX SKY SCENE ── */
+/* ── SKY SCENE ── */
 #sky-scene {
   position: fixed;
   inset: 0;
@@ -82,7 +77,6 @@ body {
   overflow: hidden;
 }
 
-/* Celestial body (sun/moon) */
 .celestial {
   position: absolute;
   width: 52px; height: 52px;
@@ -97,7 +91,6 @@ body {
   box-shadow: 0 0 0 6px rgba(200,220,255,0.15), 0 0 0 18px rgba(200,220,255,0.07);
 }
 
-/* Stars (night only) */
 .stars {
   position: absolute;
   inset: 0;
@@ -106,7 +99,6 @@ body {
 }
 [data-theme="night"] .stars { opacity: 1; }
 
-/* Pixel clouds */
 .cloud-layer {
   position: absolute;
   top: 0; left: 0;
@@ -133,12 +125,21 @@ body {
   to   { transform: translateX(-50%); }
 }
 
-/* Pixel ground stripe */
+/* ── WIND / MIST CANVAS (mid-right to mid-left) ── */
+#wind-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── GROUND ── */
 .ground-stripe {
   position: fixed;
   bottom: 0; left: 0;
   width: 100%; height: 48px;
-  z-index: 1;
+  z-index: 4;
   pointer-events: none;
   background:
     repeating-linear-gradient(90deg,
@@ -157,7 +158,76 @@ body {
   background: color-mix(in srgb, var(--ground) 110%, #fff 20%);
 }
 
-/* ── HEADER / NAV ── */
+/* ── GAME CANVAS LAYER ── */
+#game-canvas {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100%; height: 160px;
+  z-index: 5;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+/* ── CLICK RIPPLE ZONE ── */
+#bg-click-zone {
+  position: fixed;
+  inset: 56px 0 160px 0;
+  z-index: 3;
+  cursor: pointer;
+}
+
+/* ── GAME UI ── */
+#game-ui {
+  position: fixed;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  display: none;
+  gap: 12px;
+  background: rgba(0,0,0,0.55);
+  border: 2px solid #FFD700;
+  padding: 4px 12px;
+  pointer-events: none;
+}
+#game-ui.active { display: flex; }
+#game-ui span { color: #FFD700; }
+
+/* ── GAME PROMPT ── */
+#game-prompt {
+  position: fixed;
+  bottom: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid var(--border);
+  padding: 4px 10px;
+  animation: blink 2s step-start infinite;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ── ATTACK FLASH ── */
+#attack-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(255,200,0,0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.08s;
+}
+
+/* ── HEADER ── */
 header {
   position: sticky;
   top: 0; z-index: 100;
@@ -172,7 +242,6 @@ header {
   image-rendering: pixelated;
   transition: background 0.4s, border-color 0.4s;
 }
-
 .nav-logo {
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;
@@ -182,346 +251,144 @@ header {
   letter-spacing: 1px;
 }
 [data-theme="night"] .nav-logo { color: var(--night-border); }
-
-nav {
-  display: flex;
-  gap: 0.2rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
+nav { display: flex; gap: 0.2rem; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 nav::-webkit-scrollbar { display: none; }
-
 nav a {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: #aaffaa;
-  text-decoration: none;
-  padding: 6px 8px;
-  border: 2px solid transparent;
-  transition: border-color 0.1s, color 0.1s, background 0.1s;
-  white-space: nowrap;
+  font-family: 'Press Start 2P', monospace; font-size: 7px; color: #aaffaa;
+  text-decoration: none; padding: 6px 8px; border: 2px solid transparent;
+  transition: border-color 0.1s, color 0.1s, background 0.1s; white-space: nowrap;
 }
-nav a:hover, nav a.active {
-  color: #fff;
-  border-color: var(--border);
-  background: rgba(255,255,255,0.08);
-}
-
-/* Theme toggle */
+nav a:hover, nav a.active { color: #fff; border-color: var(--border); background: rgba(255,255,255,0.08); }
 #theme-btn {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  background: transparent;
-  border: 2px solid var(--border);
-  color: var(--border);
-  padding: 6px 10px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.2s, color 0.2s;
-  image-rendering: pixelated;
+  font-family: 'Press Start 2P', monospace; font-size: 7px; background: transparent;
+  border: 2px solid var(--border); color: var(--border); padding: 6px 10px;
+  cursor: pointer; white-space: nowrap; transition: background 0.2s, color 0.2s;
 }
 #theme-btn:hover { background: var(--border); color: #000; }
 
-/* ── MAIN LAYOUT ── */
+/* ── MAIN ── */
 main {
-  position: relative;
-  z-index: 2;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem 6rem;
+  position: relative; z-index: 2; max-width: 860px;
+  margin: 0 auto; padding: 2rem 1.5rem 6rem;
 }
 
-/* ── HERO SECTION ── */
-.hero {
-  margin: 2rem 0 2.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-}
+/* ── HERO ── */
+.hero { margin: 2rem 0 2.5rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .hero-avatar {
-  width: 80px; height: 80px;
-  border: 4px solid var(--border);
-  border-radius: 0;
-  image-rendering: pixelated;
-  flex-shrink: 0;
-  background: var(--panel);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 48px;
-  box-shadow: 4px 4px 0 #000;
-  transition: border-color 0.4s;
+  width: 80px; height: 80px; border: 4px solid var(--border); border-radius: 0;
+  image-rendering: pixelated; flex-shrink: 0; background: var(--panel);
+  display: flex; align-items: center; justify-content: center; font-size: 48px;
+  box-shadow: 4px 4px 0 #000; transition: border-color 0.4s;
 }
 .hero-text h1 {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 13px;
-  color: var(--accent);
-  text-shadow: 2px 2px 0 #000;
-  line-height: 1.6;
-  margin-bottom: 6px;
+  font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--accent);
+  text-shadow: 2px 2px 0 #000; line-height: 1.6; margin-bottom: 6px;
 }
 [data-theme="night"] .hero-text h1 { color: var(--night-border); text-shadow: 0 0 8px var(--night-border), 2px 2px 0 #000; }
-.hero-text .subtitle {
-  font-size: 18px;
-  color: var(--text);
-  opacity: 0.85;
-}
+.hero-text .subtitle { font-size: 18px; color: var(--text); opacity: 0.85; }
 .hero-text .open-badge {
-  display: inline-block;
-  margin-top: 6px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  background: #22c55e;
-  color: #fff;
-  padding: 4px 10px;
-  border: 2px solid #15803d;
-  box-shadow: 2px 2px 0 #000;
-  animation: blink 1.5s step-start infinite;
+  display: inline-block; margin-top: 6px; font-family: 'Press Start 2P', monospace;
+  font-size: 7px; background: #22c55e; color: #fff; padding: 4px 10px;
+  border: 2px solid #15803d; box-shadow: 2px 2px 0 #000; animation: blink 1.5s step-start infinite;
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-/* ── PIXEL PANEL (section container) ── */
+/* ── PANEL ── */
 .panel {
-  background: var(--panel);
-  border: 4px solid var(--border);
-  box-shadow: 6px 6px 0 #000;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  position: relative;
-  transition: background 0.4s, border-color 0.4s;
+  background: var(--panel); border: 4px solid var(--border);
+  box-shadow: 6px 6px 0 #000; padding: 1.5rem; margin-bottom: 2rem;
+  position: relative; transition: background 0.4s, border-color 0.4s;
 }
-[data-theme="night"] .panel {
-  box-shadow: 6px 6px 0 var(--night-border);
-}
-
+[data-theme="night"] .panel { box-shadow: 6px 6px 0 var(--night-border); }
 .panel-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: var(--accent);
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-shadow: 1px 1px 0 #000;
+  font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--accent);
+  margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; gap: 8px; text-shadow: 1px 1px 0 #000;
   transition: color 0.4s, border-color 0.4s;
 }
 [data-theme="night"] .panel-title { color: var(--night-border); text-shadow: 0 0 6px var(--night-border); }
-
-.panel-title::before {
-  content: '▶';
-  font-size: 10px;
-  color: var(--border);
-  animation: arrowPulse 1s step-start infinite;
-}
+.panel-title::before { content: '▶'; font-size: 10px; color: var(--border); animation: arrowPulse 1s step-start infinite; }
 @keyframes arrowPulse { 0%,100%{opacity:1} 50%{opacity:0} }
 
-/* ── PIXEL PORTRAIT (zelda-style stat block) ── */
-.stat-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 18px;
-}
-.stat-key {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--border);
-  min-width: 90px;
-  transition: color 0.4s;
-}
+/* ── STAT ROW ── */
+.stat-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; font-size: 18px; }
+.stat-key { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--border); min-width: 90px; transition: color 0.4s; }
 .stat-val { color: var(--text); }
 
-/* ── LIFE HEARTS (hp-style skill meter) ── */
-.skill-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-.skill-name {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--text);
-  min-width: 160px;
-}
+/* ── SKILLS ── */
+.skill-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.skill-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--text); min-width: 160px; }
 .hearts { display: flex; gap: 2px; }
 .heart { font-size: 14px; }
 .heart.empty { opacity: 0.2; }
 
-/* ── QUEST LOG (work experience) ── */
-.quest {
-  border-left: 4px solid var(--border);
-  padding-left: 1rem;
-  margin-bottom: 1.2rem;
-  transition: border-color 0.4s;
-}
-.quest-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--accent);
-  margin-bottom: 2px;
-  transition: color 0.4s;
-}
+/* ── QUEST ── */
+.quest { border-left: 4px solid var(--border); padding-left: 1rem; margin-bottom: 1.2rem; transition: border-color 0.4s; }
+.quest-title { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--accent); margin-bottom: 2px; transition: color 0.4s; }
 [data-theme="night"] .quest-title { color: var(--night-border); }
 .quest-org { font-size: 17px; color: var(--border); font-style: italic; margin-bottom: 4px; transition: color 0.4s; }
 .quest-desc { font-size: 17px; color: var(--text); line-height: 1.4; }
 
-/* ── ITEM CHEST (projects) ── */
-.chest-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
+/* ── CHEST ── */
+.chest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
 .chest {
-  border: 3px solid var(--border);
-  background: color-mix(in srgb, var(--panel) 80%, #000 20%);
-  padding: 1rem;
-  cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s, border-color 0.4s;
-  position: relative;
+  border: 3px solid var(--border); background: color-mix(in srgb, var(--panel) 80%, #000 20%);
+  padding: 1rem; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s, border-color 0.4s; position: relative;
 }
-.chest:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--border);
-}
+.chest:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--border); }
 .chest-icon { font-size: 28px; margin-bottom: 6px; }
-.chest-name {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--accent);
-  margin-bottom: 6px;
-  line-height: 1.6;
-  transition: color 0.4s;
-}
+.chest-name { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--accent); margin-bottom: 6px; line-height: 1.6; transition: color 0.4s; }
 [data-theme="night"] .chest-name { color: var(--night-border); }
 .chest-desc { font-size: 15px; color: var(--text); line-height: 1.4; margin-bottom: 8px; }
-.chest-link {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--link);
-  text-decoration: none;
-  border: 2px solid var(--link);
-  padding: 4px 8px;
-  display: inline-block;
-  transition: background 0.1s, color 0.1s;
-}
+.chest-link { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--link); text-decoration: none; border: 2px solid var(--link); padding: 4px 8px; display: inline-block; transition: background 0.1s, color 0.1s; }
 .chest-link:hover { background: var(--link); color: #fff; }
 
-/* ── CERT SCROLL (certifications) ── */
-.cert-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-.cert-card {
-  border: 3px solid var(--border);
-  background: color-mix(in srgb, var(--panel) 90%, #000 10%);
-  padding: 0.75rem;
-  text-align: center;
-  transition: border-color 0.4s;
-}
-.cert-card img {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  border: 2px solid var(--border);
-  margin-bottom: 6px;
-  image-rendering: auto;
-  loading: lazy;
-}
+/* ── CERT ── */
+.cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.cert-card { border: 3px solid var(--border); background: color-mix(in srgb, var(--panel) 90%, #000 10%); padding: 0.75rem; text-align: center; transition: border-color 0.4s; }
+.cert-card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border: 2px solid var(--border); margin-bottom: 6px; }
 .cert-card p { font-size: 14px; color: var(--text); line-height: 1.4; }
-.cert-card strong {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  display: block;
-  color: var(--accent);
-  margin-bottom: 2px;
-  transition: color 0.4s;
-}
+.cert-card strong { font-family: 'Press Start 2P', monospace; font-size: 7px; display: block; color: var(--accent); margin-bottom: 2px; transition: color 0.4s; }
 [data-theme="night"] .cert-card strong { color: var(--night-border); }
 
-/* ── DIALOGUE BOX (contact / objective) ── */
-.dialogue {
-  border: 4px solid var(--border);
-  background: var(--panel);
-  padding: 1rem 1.25rem;
-  position: relative;
-  font-size: 18px;
-  line-height: 1.6;
-  transition: background 0.4s, border-color 0.4s;
-}
-.dialogue::before {
-  content: '💬';
-  position: absolute;
-  top: -18px; left: 12px;
-  font-size: 20px;
-}
-.dialogue-name {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--accent);
-  margin-bottom: 8px;
-  transition: color 0.4s;
-}
+/* ── DIALOGUE ── */
+.dialogue { border: 4px solid var(--border); background: var(--panel); padding: 1rem 1.25rem; position: relative; font-size: 18px; line-height: 1.6; transition: background 0.4s, border-color 0.4s; }
+.dialogue::before { content: '💬'; position: absolute; top: -18px; left: 12px; font-size: 20px; }
+.dialogue-name { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--accent); margin-bottom: 8px; transition: color 0.4s; }
 [data-theme="night"] .dialogue-name { color: var(--night-border); }
 
-/* ── CTA BUTTON (zelda menu style) ── */
+/* ── BUTTON ── */
 .btn-pixel {
-  display: inline-block;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  padding: 10px 16px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-bottom: 4px solid color-mix(in srgb, var(--accent) 60%, #000);
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.1s, border-bottom-width 0.1s;
-  box-shadow: 3px 3px 0 #000;
-  margin: 4px;
+  display: inline-block; font-family: 'Press Start 2P', monospace; font-size: 8px;
+  padding: 10px 16px; background: var(--accent); color: #fff; border: none;
+  border-bottom: 4px solid color-mix(in srgb, var(--accent) 60%, #000); text-decoration: none;
+  cursor: pointer; transition: transform 0.1s, border-bottom-width 0.1s; box-shadow: 3px 3px 0 #000; margin: 4px;
 }
 .btn-pixel:hover { transform: translateY(2px); border-bottom-width: 2px; }
 [data-theme="night"] .btn-pixel { background: var(--night-border); color: #000; border-bottom-color: #007744; box-shadow: 3px 3px 0 #00ff88; }
 
-/* ── PIXEL DIVIDER ── */
-.px-divider {
-  height: 8px;
-  background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 8px, transparent 8px, transparent 16px);
-  margin: 0.5rem 0 1.5rem;
-  opacity: 0.4;
-  transition: background 0.4s;
-}
+/* ── DIVIDER ── */
+.px-divider { height: 8px; background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 8px, transparent 8px, transparent 16px); margin: 0.5rem 0 1.5rem; opacity: 0.4; transition: background 0.4s; }
 
-/* ── STARS CANVAS ── */
-#stars-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-}
+/* ── STARS ── */
+#stars-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* ── FOOTER ── */
 footer {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: var(--border);
-  padding: 1rem 1rem 4rem;
-  background: var(--header);
-  border-top: 4px solid var(--border);
-  transition: background 0.4s, border-color 0.4s;
+  position: relative; z-index: 2; text-align: center; font-family: 'Press Start 2P', monospace;
+  font-size: 7px; color: var(--border); padding: 1rem 1rem 4rem; background: var(--header);
+  border-top: 4px solid var(--border); transition: background 0.4s, border-color 0.4s;
 }
 footer a { color: var(--link); }
 
-/* ── FADE IN ── */
+/* ── ANIMATIONS ── */
 .panel { animation: fadeUp 0.6s ease both; }
 @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+/* ── TOOLTIP ── */
+.tooltip-wrap { position: relative; display: inline-block; }
+.tooltip-wrap .tooltip { visibility: hidden; opacity: 0; font-family: 'Press Start 2P', monospace; font-size: 7px; background: #000; color: #0f0; border: 2px solid #0f0; padding: 6px 10px; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); white-space: nowrap; transition: opacity 0.2s; z-index: 999; pointer-events: none; }
+.tooltip-wrap:hover .tooltip { visibility: visible; opacity: 1; }
 
 /* ── MOBILE ── */
 @media (max-width: 600px) {
@@ -533,41 +400,10 @@ footer a { color: var(--link); }
   .cert-grid { grid-template-columns: 1fr; }
 }
 
-/* ── TOOLTIP ── */
-.tooltip-wrap { position: relative; display: inline-block; }
-.tooltip-wrap .tooltip {
-  visibility: hidden; opacity: 0;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  background: #000;
-  color: #0f0;
-  border: 2px solid #0f0;
-  padding: 6px 10px;
-  position: absolute;
-  bottom: 120%; left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  transition: opacity 0.2s;
-  z-index: 999;
-  pointer-events: none;
-}
-.tooltip-wrap:hover .tooltip { visibility: visible; opacity: 1; }
-
-/* ── NPC WALK ANIMATION ── */
-.npc {
-  position: fixed;
-  bottom: 48px;
-  z-index: 3;
-  font-size: 22px;
-  animation: npcWalk 18s linear infinite;
-  pointer-events: none;
-}
-@keyframes npcWalk {
-  0%   { left: -40px; transform: scaleX(1); }
-  49%  { left: calc(100vw + 40px); transform: scaleX(1); }
-  50%  { left: calc(100vw + 40px); transform: scaleX(-1); }
-  99%  { left: -40px; transform: scaleX(-1); }
-  100% { left: -40px; transform: scaleX(1); }
+/* ── KILL FLASH EFFECT ── */
+@keyframes killFlash {
+  0% { opacity: 0.7; }
+  100% { opacity: 0; }
 }
 </style>
 </head>
@@ -582,11 +418,28 @@ footer a { color: var(--link); }
   </div>
 </div>
 
-<!-- NPC walker -->
-<div class="npc" aria-hidden="true">🧙</div>
+<!-- WIND / MIST -->
+<canvas id="wind-canvas"></canvas>
+
+<!-- BG CLICK ZONE -->
+<div id="bg-click-zone" aria-label="Click to trigger adventure"></div>
+
+<!-- GAME CANVAS -->
+<canvas id="game-canvas"></canvas>
 
 <!-- GROUND -->
 <div class="ground-stripe"></div>
+
+<!-- GAME UI -->
+<div id="game-ui">
+  ❤️ <span id="hp-display">3</span> &nbsp;|&nbsp; ⚔️ KILLS: <span id="kill-display">0</span> &nbsp;|&nbsp; 🏆 BEST: <span id="best-display">0</span>
+</div>
+
+<!-- GAME PROMPT -->
+<div id="game-prompt">✦ CLICK ANYWHERE TO BEGIN THE ADVENTURE ✦</div>
+
+<!-- ATTACK FLASH -->
+<div id="attack-flash"></div>
 
 <!-- HEADER -->
 <header>
@@ -605,8 +458,6 @@ footer a { color: var(--link); }
 
 <!-- MAIN -->
 <main>
-
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-avatar" aria-hidden="true">⚔️</div>
     <div class="hero-text">
@@ -617,7 +468,6 @@ footer a { color: var(--link); }
     </div>
   </section>
 
-  <!-- CAREER OBJECTIVE -->
   <section id="objective">
     <div class="panel">
       <div class="panel-title">CAREER QUEST</div>
@@ -637,52 +487,34 @@ footer a { color: var(--link); }
     </div>
   </section>
 
-  <!-- EDUCATION -->
   <section id="education">
     <div class="panel">
       <div class="panel-title">LORE & ORIGINS</div>
-      <div class="stat-row">
-        <span class="stat-key">SCHOOL</span>
-        <span class="stat-val">Cavite State University</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-key">DEGREE</span>
-        <span class="stat-val">BS Computer Science</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-key">CAMPUS 1</span>
-        <span class="stat-val">Imus Campus (2017–2023)</span>
-      </div>
-      <div class="stat-row">
-        <span class="stat-key">CAMPUS 2</span>
-        <span class="stat-val">Rosario Campus (2013–2016)</span>
-      </div>
+      <div class="stat-row"><span class="stat-key">SCHOOL</span><span class="stat-val">Cavite State University</span></div>
+      <div class="stat-row"><span class="stat-key">DEGREE</span><span class="stat-val">BS Computer Science</span></div>
+      <div class="stat-row"><span class="stat-key">CAMPUS 1</span><span class="stat-val">Imus Campus (2017–2023)</span></div>
+      <div class="stat-row"><span class="stat-key">CAMPUS 2</span><span class="stat-val">Rosario Campus (2013–2016)</span></div>
     </div>
   </section>
 
-  <!-- WORK EXPERIENCE -->
   <section id="experience">
     <div class="panel">
       <div class="panel-title">ADVENTURE LOG</div>
-
       <div class="quest">
         <div class="quest-title">MIS ASSISTANT</div>
         <div class="quest-org">Easycash Lending Company Inc.</div>
         <div class="quest-desc">Managed data systems, financial records, and internal IT tools.</div>
       </div>
-
       <div class="quest">
         <div class="quest-title">TECHNICAL SUPPORT</div>
         <div class="quest-org">iQor</div>
         <div class="quest-desc">Handled customer-facing tech troubleshooting in a BPO environment.</div>
       </div>
-
       <div class="quest">
         <div class="quest-title">STATION HEAD</div>
         <div class="quest-org">SeaOil Philippines</div>
         <div class="quest-desc">Led daily operations including inventory, financial reconciliation, and staff coordination.</div>
       </div>
-
       <div class="quest">
         <div class="quest-title">IT SUPPORT INTERN</div>
         <div class="quest-org">Micro Star International (MSI)</div>
@@ -691,163 +523,112 @@ footer a { color: var(--link); }
     </div>
   </section>
 
-  <!-- SKILLS -->
   <section id="skills">
     <div class="panel">
       <div class="panel-title">CHARACTER STATS</div>
-
       <div style="margin-bottom:1rem;">
         <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:var(--border); margin-bottom:8px;">DEVELOPMENT</div>
-        <div class="skill-row">
-          <span class="skill-name">HTML5 / CSS3</span>
-          <div class="hearts">❤️❤️❤️❤️❤️</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">JavaScript</span>
-          <div class="hearts">❤️❤️❤️❤️🖤</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">Apps Script / Excel</span>
-          <div class="hearts">❤️❤️❤️❤️🖤</div>
-        </div>
+        <div class="skill-row"><span class="skill-name">HTML5 / CSS3</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
+        <div class="skill-row"><span class="skill-name">JavaScript</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
+        <div class="skill-row"><span class="skill-name">Apps Script / Excel</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
       </div>
-
       <div style="margin-bottom:1rem;">
         <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:var(--border); margin-bottom:8px;">DATABASE & IT</div>
-        <div class="skill-row">
-          <span class="skill-name">System Troubleshooting</span>
-          <div class="hearts">❤️❤️❤️❤️❤️</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">Hardware Maintenance</span>
-          <div class="hearts">❤️❤️❤️❤️❤️</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">MongoDB / Airtable</span>
-          <div class="hearts">❤️❤️❤️🖤🖤</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">Linux Bash / AWS</span>
-          <div class="hearts">❤️❤️❤️🖤🖤</div>
-        </div>
+        <div class="skill-row"><span class="skill-name">System Troubleshooting</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
+        <div class="skill-row"><span class="skill-name">Hardware Maintenance</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
+        <div class="skill-row"><span class="skill-name">MongoDB / Airtable</span><div class="hearts">❤️❤️❤️🖤🖤</div></div>
+        <div class="skill-row"><span class="skill-name">Linux Bash / AWS</span><div class="hearts">❤️❤️❤️🖤🖤</div></div>
       </div>
-
       <div>
         <div style="font-family:'Press Start 2P',monospace; font-size:8px; color:var(--border); margin-bottom:8px;">OPERATIONS</div>
-        <div class="skill-row">
-          <span class="skill-name">Inventory Management</span>
-          <div class="hearts">❤️❤️❤️❤️❤️</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">Financial Reconciliation</span>
-          <div class="hearts">❤️❤️❤️❤️🖤</div>
-        </div>
-        <div class="skill-row">
-          <span class="skill-name">SEO / Digital Marketing</span>
-          <div class="hearts">❤️❤️❤️❤️🖤</div>
-        </div>
+        <div class="skill-row"><span class="skill-name">Inventory Management</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
+        <div class="skill-row"><span class="skill-name">Financial Reconciliation</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
+        <div class="skill-row"><span class="skill-name">SEO / Digital Marketing</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
       </div>
     </div>
   </section>
 
-  <!-- PROJECTS -->
   <section id="projects">
     <div class="panel">
       <div class="panel-title">ITEM CHEST</div>
       <div class="chest-grid">
-
         <div class="chest">
           <div class="chest-icon">⛽</div>
           <div class="chest-name">FUEL IMS &<br>VARIANCE CHECKER</div>
           <div class="chest-desc">Enterprise inventory system for Philippine fuel stations. SRP auditing + UST order forecasting.</div>
           <a href="https://jomerbiason.github.io/fuel-inventory-management-system-and-variance-checker/" target="_blank" class="chest-link">▶ OPEN APP</a>
         </div>
-
         <div class="chest">
           <div class="chest-icon">🎮</div>
           <div class="chest-name">GRID-CRYPT</div>
           <div class="chest-desc">Procedural 8-bit rogue-lite dungeon game with Web Audio engine. Optimized for mobile landscape.</div>
           <a href="https://jomerbiason.github.io/grid-crypt/" target="_blank" class="chest-link">▶ PLAY GAME</a>
         </div>
-
         <div class="chest">
           <div class="chest-icon">💣</div>
           <div class="chest-name">MINESWEEPER CLASSIC</div>
           <div class="chest-desc">Polished browser Minesweeper with difficulty levels, millisecond timer, and touch controls.</div>
           <a href="https://jomerbiason.github.io/minesweeper-classic/" target="_blank" class="chest-link">▶ PLAY GAME</a>
         </div>
-
         <div class="chest">
           <div class="chest-icon">🌐</div>
           <div class="chest-name">CURRICULUM VITAE</div>
           <div class="chest-desc">This portfolio site — responsive, animated, with dark mode and downloadable CV.</div>
           <a href="https://jomerbiason.github.io/curriculum-vitae/" target="_blank" class="chest-link">▶ VISIT SITE</a>
         </div>
-
       </div>
     </div>
   </section>
 
-  <!-- CERTIFICATIONS -->
   <section id="certs">
     <div class="panel">
       <div class="panel-title">SKILL SCROLLS</div>
       <div class="cert-grid">
-
         <div class="cert-card">
           <a href="certs/Technical Compliance Workshop by Credit Information Corporation.jpg" target="_blank">
             <img src="certs/Technical Compliance Workshop by Credit Information Corporation.jpg" alt="Technical Compliance" loading="lazy">
           </a>
           <p><strong>TECHNICAL COMPLIANCE</strong>Credit Information Corporation</p>
         </div>
-
         <div class="cert-card">
           <a href="certs/Fundamentals of Digital Marketing Certification by Google Digital Garage.jpg" target="_blank">
             <img src="certs/Fundamentals of Digital Marketing Certification by Google Digital Garage.jpg" alt="Digital Marketing" loading="lazy">
           </a>
           <p><strong>DIGITAL MARKETING</strong>Google Digital Garage</p>
         </div>
-
         <div class="cert-card">
           <a href="certs/Installing and Configuring Computer Systems Certification by TESDA.jpg" target="_blank">
             <img src="certs/Installing and Configuring Computer Systems Certification by TESDA.jpg" alt="Computer Systems" loading="lazy">
           </a>
           <p><strong>COMPUTER SYSTEMS</strong>TESDA</p>
         </div>
-
         <div class="cert-card">
           <a href="certs/Search Engine Optimization Certification by HubSpot Academy.jpg" target="_blank">
             <img src="certs/Search Engine Optimization Certification by HubSpot Academy.jpg" alt="SEO" loading="lazy">
           </a>
           <p><strong>SEO CERTIFICATION</strong>HubSpot Academy</p>
         </div>
-
         <div class="cert-card">
           <a href="certs/Inventory Management Certification by HP.jpg" target="_blank">
             <img src="certs/Inventory Management Certification by Hewlett-Packard.jpg" alt="Inventory Management" loading="lazy">
           </a>
           <p><strong>INVENTORY MANAGEMENT</strong>Hewlett-Packard</p>
         </div>
-
         <div class="cert-card">
           <a href="certs/REST API with Springboot Certification by CvSU Imus Campus.jpg" target="_blank">
             <img src="certs/REST API with Springboot Certification by CvSU Imus Campus.jpg" alt="REST API" loading="lazy">
           </a>
           <p><strong>REST API / SPRINGBOOT</strong>Cavite State University</p>
         </div>
-
       </div>
     </div>
   </section>
 
-  <!-- REFERENCES -->
   <section id="references">
     <div class="panel">
       <div class="panel-title">PARTY MEMBERS</div>
       <details>
-        <summary style="font-family:'Press Start 2P',monospace; font-size:8px; color:var(--border); cursor:pointer; padding:6px 0;">
-          ▶ REVEAL REFERENCES
-        </summary>
+        <summary style="font-family:'Press Start 2P',monospace; font-size:8px; color:var(--border); cursor:pointer; padding:6px 0;">▶ REVEAL REFERENCES</summary>
         <div style="margin-top:1rem;">
           <div class="quest">
             <div class="quest-title">LIEZEL PENTECOSTES</div>
@@ -869,7 +650,6 @@ footer a { color: var(--link); }
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section id="contact">
     <div class="panel">
       <div class="panel-title">SEND MESSAGE</div>
@@ -889,7 +669,6 @@ footer a { color: var(--link); }
       </div>
     </div>
   </section>
-
 </main>
 
 <footer>
@@ -898,107 +677,799 @@ footer a { color: var(--link); }
 </footer>
 
 <script>
-/* ── STARS ── */
+/* ══════════════════════════════════════════════
+   STARS
+══════════════════════════════════════════════ */
 (function(){
   const canvas = document.getElementById('stars-canvas');
   const ctx = canvas.getContext('2d');
   let stars = [];
-  function resize(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   function initStars(){
     stars = [];
-    for(let i=0;i<120;i++){
-      stars.push({
-        x: Math.random()*canvas.width,
-        y: Math.random()*canvas.height*0.7,
-        r: Math.random()*1.5+0.5,
-        t: Math.random()*Math.PI*2
-      });
-    }
+    for(let i=0;i<120;i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height*0.7, r: Math.random()*1.5+0.5, t: Math.random()*Math.PI*2 });
   }
-  function drawStars(ts){
+  function drawStars(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    stars.forEach(s=>{
-      s.t += 0.015;
-      const alpha = 0.5+0.5*Math.sin(s.t);
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(200,230,255,${alpha})`;
-      ctx.fill();
-    });
+    stars.forEach(s=>{ s.t+=0.015; const a=0.5+0.5*Math.sin(s.t); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(200,230,255,${a})`; ctx.fill(); });
     requestAnimationFrame(drawStars);
   }
-  resize();
-  initStars();
-  window.addEventListener('resize', ()=>{ resize(); initStars(); });
+  resize(); initStars();
+  window.addEventListener('resize',()=>{ resize(); initStars(); });
   requestAnimationFrame(drawStars);
 })();
 
-/* ── AUTO DAY/NIGHT ── */
+/* ══════════════════════════════════════════════
+   THEME
+══════════════════════════════════════════════ */
 (function(){
   const btn = document.getElementById('theme-btn');
   const body = document.documentElement;
   let manual = false;
-
-  function applyTheme(theme){
-    body.setAttribute('data-theme', theme);
-    btn.textContent = theme === 'night' ? '☀️ DAY' : '🌙 NIGHT';
-  }
-
-  function autoTheme(){
-    if(manual) return;
-    const h = new Date().getHours();
-    applyTheme((h >= 6 && h < 18) ? 'day' : 'night');
-  }
-
-  // load saved
+  function applyTheme(t){ body.setAttribute('data-theme',t); btn.textContent = t==='night'?'☀️ DAY':'🌙 NIGHT'; }
+  function autoTheme(){ if(manual) return; const h=new Date().getHours(); applyTheme((h>=6&&h<18)?'day':'night'); }
   const saved = localStorage.getItem('jomer-theme');
-  if(saved){ manual = true; applyTheme(saved); }
-  else { autoTheme(); }
-
-  btn.addEventListener('click', ()=>{
-    manual = true;
-    const current = body.getAttribute('data-theme');
-    const next = current === 'night' ? 'day' : 'night';
-    applyTheme(next);
-    localStorage.setItem('jomer-theme', next);
-  });
-
-  // check every minute for auto-switch
-  setInterval(autoTheme, 60000);
+  if(saved){ manual=true; applyTheme(saved); } else { autoTheme(); }
+  btn.addEventListener('click',()=>{ manual=true; const c=body.getAttribute('data-theme'); const n=c==='night'?'day':'night'; applyTheme(n); localStorage.setItem('jomer-theme',n); });
+  setInterval(autoTheme,60000);
 })();
 
-/* ── NAV ACTIVE HIGHLIGHT ── */
+/* ══════════════════════════════════════════════
+   NAV ACTIVE
+══════════════════════════════════════════════ */
 (function(){
   const sections = document.querySelectorAll('section[id]');
   const links = document.querySelectorAll('#main-nav a');
   const obs = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        links.forEach(l=>{
-          l.classList.toggle('active', l.getAttribute('href') === '#'+e.target.id);
-        });
-      }
-    });
-  }, { threshold: 0.4 });
+    entries.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>{ l.classList.toggle('active', l.getAttribute('href')==='#'+e.target.id); }); } });
+  },{ threshold: 0.4 });
   sections.forEach(s=>obs.observe(s));
 })();
 
-/* ── PANEL STAGGER ANIMATION ── */
+/* ══════════════════════════════════════════════
+   PANEL STAGGER
+══════════════════════════════════════════════ */
 (function(){
   const panels = document.querySelectorAll('.panel');
   const obs = new IntersectionObserver(entries=>{
-    entries.forEach((e,i)=>{
-      if(e.isIntersecting){
-        e.target.style.animationDelay = '0s';
-        e.target.style.animationPlayState = 'running';
-        obs.unobserve(e.target);
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.style.animationDelay='0s'; e.target.style.animationPlayState='running'; obs.unobserve(e.target); } });
+  },{ threshold: 0.1 });
+  panels.forEach(p=>{ p.style.animationPlayState='paused'; obs.observe(p); });
+})();
+
+/* ══════════════════════════════════════════════
+   WIND / MIST EFFECT (mid-right → mid-left)
+══════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('wind-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function spawnParticle(){
+    // Spawn in the middle-right area
+    const yCenter = H * 0.42;
+    const ySpread = H * 0.22;
+    return {
+      x: W + Math.random() * 120,
+      y: yCenter + (Math.random() - 0.5) * ySpread,
+      vx: -(1.2 + Math.random() * 2.4),
+      vy: (Math.random() - 0.5) * 0.4,
+      life: 1.0,
+      decay: 0.003 + Math.random() * 0.004,
+      size: 60 + Math.random() * 140,
+      alpha: 0.03 + Math.random() * 0.07,
+      hue: Math.random() > 0.5 ? 'rgba(255,255,255,' : 'rgba(180,220,255,'
+    };
+  }
+
+  function initParticles(){
+    particles = [];
+    for(let i=0;i<30;i++){
+      const p = spawnParticle();
+      p.x = Math.random() * W * 1.5; // pre-scatter across screen initially
+      p.life = Math.random();
+      particles.push(p);
+    }
+  }
+
+  function drawParticles(){
+    ctx.clearRect(0,0,W,H);
+    const isNight = document.documentElement.getAttribute('data-theme') === 'night';
+
+    particles.forEach(p => {
+      const a = p.alpha * p.life;
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+      const color = isNight ? 'rgba(100,200,180,' : 'rgba(255,255,255,';
+      grad.addColorStop(0, color + (a * 0.8) + ')');
+      grad.addColorStop(0.4, color + (a * 0.3) + ')');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+    });
+
+    // Remove dead, spawn new
+    particles = particles.filter(p => p.life > 0);
+    while(particles.length < 30) particles.push(spawnParticle());
+
+    requestAnimationFrame(drawParticles);
+  }
+
+  resize();
+  initParticles();
+  window.addEventListener('resize', ()=>{ resize(); initParticles(); });
+  requestAnimationFrame(drawParticles);
+})();
+
+/* ══════════════════════════════════════════════
+   SPRITE PIXEL ART DEFINITIONS
+   All drawn programmatically on canvas — no external images needed
+══════════════════════════════════════════════ */
+const SPRITES = {
+  // ── CHAMPION ──
+  // Each frame is a 16×16 pixel grid (0=transparent, color codes below)
+  // Colors: 1=skin, 2=hair/darkbrown, 3=gold(shield/sword), 4=green(tunic), 5=darkgreen, 6=brown(belt), 7=red, 8=silver, 9=white, A=darkbrown
+  champion: {
+    palette: {
+      1: '#FDBCB4', 2: '#5C3317', 3: '#FFD700', 4: '#3a7d44', 5: '#2d6a4f',
+      6: '#7B4C00', 7: '#CC2222', 8: '#C0C0C0', 9: '#FFFFFF', A: '#3d2b1f',
+      B: '#111111', C: '#88aaff', D: '#6688ff'
+    },
+    // IDLE frame (training at dummy)
+    idle: [
+      [0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0],
+      [0,0,0,0,2,1,1,1,1,2,0,0,0,0,0,0],
+      [0,0,0,0,2,1,1,1,1,2,0,0,0,0,0,0],
+      [0,0,0,0,0,2,1,1,2,0,0,0,0,0,0,0],
+      [0,0,0,3,4,4,4,4,4,4,0,0,0,0,0,0],
+      [0,0,3,3,4,4,4,4,4,4,4,0,0,0,0,0],
+      [0,3,3,3,4,6,6,6,6,4,4,0,0,0,0,0],
+      [0,3,3,3,5,5,5,5,5,5,4,0,0,0,0,0],
+      [0,0,3,3,5,5,5,5,5,5,4,0,0,8,8,0],
+      [0,0,0,0,4,4,4,4,4,4,0,0,0,8,0,0],
+      [0,0,0,0,5,5,0,0,5,5,0,0,0,8,0,0],
+      [0,0,0,0,5,5,0,0,5,5,0,0,0,0,0,0],
+      [0,0,0,0,6,6,0,0,6,6,0,0,0,0,0,0],
+      [0,0,0,0,6,6,0,0,6,6,0,0,0,0,0,0],
+      [0,0,0,0,A,A,0,0,A,A,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    // RUN frame 1
+    run1: [
+      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
+      [0,0,0,2,1,1,1,2,0,0,0,0,0,0,0,0],
+      [0,3,3,4,4,4,4,4,4,0,0,0,0,0,0,0],
+      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
+      [3,3,0,5,6,6,6,6,5,4,0,0,8,8,0,0],
+      [3,3,0,5,5,5,5,5,5,4,0,0,8,0,0,0],
+      [0,3,0,5,5,5,5,5,5,4,0,0,8,0,0,0],
+      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
+      [0,0,5,5,0,0,0,5,5,0,0,0,0,0,0,0],
+      [0,5,5,0,0,0,0,0,5,5,0,0,0,0,0,0],
+      [0,6,6,0,0,0,0,0,6,6,0,0,0,0,0,0],
+      [0,6,0,0,0,0,0,0,0,6,0,0,0,0,0,0],
+      [A,A,0,0,0,0,0,0,0,A,A,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    // RUN frame 2
+    run2: [
+      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
+      [0,0,0,2,1,1,1,2,0,0,0,0,0,0,0,0],
+      [0,3,3,4,4,4,4,4,4,0,0,0,0,0,0,0],
+      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
+      [3,3,0,5,6,6,6,6,5,4,0,0,0,8,8,0],
+      [3,3,0,5,5,5,5,5,5,4,0,0,0,8,0,0],
+      [0,3,0,5,5,5,5,5,5,4,0,0,0,8,0,0],
+      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
+      [0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0],
+      [0,0,0,6,6,0,6,6,0,0,0,0,0,0,0,0],
+      [0,0,0,6,6,0,0,6,0,0,0,0,0,0,0,0],
+      [0,0,A,A,0,0,0,A,A,0,0,0,0,0,0,0],
+      [0,A,A,0,0,0,0,0,A,A,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    // SLASH frame 1
+    slash1: [
+      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,3,3,3,3,0,0],
+      [0,0,0,2,1,1,1,2,0,3,0,0,0,3,0,0],
+      [0,3,3,4,4,4,4,4,4,3,3,0,0,0,0,0],
+      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
+      [3,3,0,5,6,6,6,6,5,4,0,8,8,8,8,0],
+      [3,3,0,5,5,5,5,5,5,4,0,0,0,0,8,0],
+      [0,3,0,5,5,5,5,5,5,4,0,0,0,0,8,0],
+      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
+      [0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0],
+      [0,5,5,0,0,0,0,5,5,0,0,0,0,0,0,0],
+      [0,6,6,0,0,0,0,6,6,0,0,0,0,0,0,0],
+      [0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0],
+      [A,A,0,0,0,0,0,0,A,A,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    // SLASH frame 2 (impact)
+    slash2: [
+      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
+      [0,0,2,1,1,1,1,1,2,0,0,3,3,3,3,3],
+      [0,0,2,1,1,1,1,1,2,0,3,3,0,0,0,3],
+      [0,0,0,2,1,1,1,2,3,3,3,0,0,0,0,0],
+      [0,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
+      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
+      [3,3,0,5,6,6,6,6,5,4,0,0,8,8,8,8],
+      [3,3,0,5,5,5,5,5,5,4,0,0,0,0,0,8],
+      [0,3,0,5,5,5,5,5,5,4,0,0,0,0,0,8],
+      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
+      [0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0],
+      [0,5,5,0,0,0,0,5,5,0,0,0,0,0,0,0],
+      [0,6,6,0,0,0,0,6,6,0,0,0,0,0,0,0],
+      [0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0],
+      [A,A,0,0,0,0,0,0,A,A,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+  },
+
+  // ── DUMMY (training post) ──
+  dummy: {
+    palette: {
+      1: '#8B6914', 2: '#5C3317', 3: '#CC6622', 4: '#DDAA55',
+      5: '#FFCC44', 6: '#4a3010', 7: '#222', 8: '#CC2222'
+    },
+    frame: [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,8,8,8,8,0,0,0,0,0,0],
+      [0,0,0,0,0,8,3,3,3,3,8,0,0,0,0,0],
+      [0,0,0,0,0,8,3,3,3,3,8,0,0,0,0,0],
+      [0,0,0,0,0,8,3,3,3,3,8,0,0,0,0,0],
+      [0,0,0,0,0,8,8,8,8,8,8,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+      [0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0],
+      [0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ]
+  },
+
+  // ── SLIME ENEMY ──
+  slime: {
+    palette: {
+      1: '#44BB44', 2: '#22AA22', 3: '#66DD66', 4: '#003300',
+      5: '#FF4444', 6: '#FFFFFF', 7: '#226622'
+    },
+    frame1: [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
+      [0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0],
+      [0,0,0,1,3,3,3,3,3,3,3,3,1,0,0,0],
+      [0,0,0,1,3,6,4,3,3,6,4,3,1,0,0,0],
+      [0,0,0,1,3,6,4,3,3,6,4,3,1,0,0,0],
+      [0,0,0,1,2,2,2,5,5,2,2,2,1,0,0,0],
+      [0,0,1,1,2,2,2,2,2,2,2,2,1,1,0,0],
+      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+      [0,0,1,7,2,2,2,2,2,2,2,2,7,1,0,0],
+      [0,0,0,1,7,7,2,2,2,2,7,7,1,0,0,0],
+      [0,0,0,0,1,1,1,7,7,1,1,1,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    frame2: [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+      [0,0,0,1,3,3,3,3,3,3,3,3,1,0,0,0],
+      [0,0,1,3,3,6,4,3,3,6,4,3,3,1,0,0],
+      [0,0,1,3,3,6,4,3,3,6,4,3,3,1,0,0],
+      [0,0,1,2,2,2,5,5,5,5,2,2,2,1,0,0],
+      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
+      [0,0,1,7,2,2,2,2,2,2,2,2,7,1,0,0],
+      [0,0,0,1,7,7,2,2,2,2,7,7,1,0,0,0],
+      [0,0,0,0,1,1,1,7,7,1,1,1,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ]
+  },
+
+  // ── SKELETON ENEMY ──
+  skeleton: {
+    palette: {
+      1: '#EEEECC', 2: '#AAAAAA', 3: '#CCCCAA', 4: '#555555',
+      5: '#FF3333', 6: '#888866', 7: '#FFFFFF', 8: '#333322'
+    },
+    frame1: [
+      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+      [0,0,0,0,1,3,3,3,3,3,1,0,0,0,0,0],
+      [0,0,0,0,1,7,4,3,4,7,1,0,0,0,0,0],
+      [0,0,0,0,1,3,3,5,3,3,1,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+      [0,0,0,0,0,2,1,1,1,2,0,0,0,0,0,0],
+      [0,0,2,0,2,1,1,1,1,1,2,0,2,0,0,0],
+      [0,2,0,2,0,2,1,1,1,2,0,2,0,2,0,0],
+      [0,0,2,0,0,2,6,6,6,2,0,0,2,0,0,0],
+      [0,0,0,0,0,2,6,6,6,2,0,0,0,0,0,0],
+      [0,0,0,0,0,2,2,0,2,2,0,0,0,0,0,0],
+      [0,0,0,0,2,2,0,0,0,2,2,0,0,0,0,0],
+      [0,0,0,2,2,0,0,0,0,0,2,2,0,0,0,0],
+      [0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0],
+      [0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    frame2: [
+      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+      [0,0,0,0,1,3,3,3,3,3,1,0,0,0,0,0],
+      [0,0,0,0,1,7,4,3,4,7,1,0,0,0,0,0],
+      [0,0,0,0,1,3,3,5,3,3,1,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+      [0,0,0,0,0,2,1,1,1,2,0,0,0,0,0,0],
+      [0,2,0,0,2,1,1,1,1,1,2,0,0,2,0,0],
+      [0,0,2,0,0,2,1,1,1,2,0,0,2,0,0,0],
+      [0,0,0,2,0,2,6,6,6,2,0,2,0,0,0,0],
+      [0,0,0,0,0,2,6,6,6,2,0,0,0,0,0,0],
+      [0,0,0,0,0,2,2,0,2,2,0,0,0,0,0,0],
+      [0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,0],
+      [0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0],
+      [0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0],
+      [0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ]
+  }
+};
+
+/* ══════════════════════════════════════════════
+   SPRITE RENDERER
+══════════════════════════════════════════════ */
+function renderSprite(ctx, grid, palette, x, y, scale, flipX) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  ctx.save();
+  if(flipX) {
+    ctx.translate(x + cols * scale, y);
+    ctx.scale(-1, 1);
+    ctx.translate(-x, -y);
+  }
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const v = grid[r][c];
+      if(v === 0) continue;
+      const key = v.toString(16).toUpperCase();
+      ctx.fillStyle = palette[key] || palette[v] || '#FF00FF';
+      ctx.fillRect(x + c*scale, y + r*scale, scale, scale);
+    }
+  }
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════
+   EXPLOSION PARTICLES
+══════════════════════════════════════════════ */
+function createExplosion(x, y) {
+  const colors = ['#FFD700','#FF6600','#FF3333','#FFFFFF','#FFAA00'];
+  return Array.from({length: 12}, () => ({
+    x, y,
+    vx: (Math.random()-0.5)*6,
+    vy: -(Math.random()*5+1),
+    life: 1.0,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    size: Math.floor(Math.random()*3+2)
+  }));
+}
+
+/* ══════════════════════════════════════════════
+   FLOATING TEXT
+══════════════════════════════════════════════ */
+function createFloatText(x, y, text, color) {
+  return { x, y, text, color, life: 1.0, vy: -1.5 };
+}
+
+/* ══════════════════════════════════════════════
+   MINIGAME ENGINE
+══════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  const gameUI = document.getElementById('game-ui');
+  const gamePrompt = document.getElementById('game-prompt');
+  const hpDisplay = document.getElementById('hp-display');
+  const killDisplay = document.getElementById('kill-display');
+  const bestDisplay = document.getElementById('best-display');
+  const attackFlash = document.getElementById('attack-flash');
+  const bgZone = document.getElementById('bg-click-zone');
+
+  const SCALE = 3; // pixel scale factor
+  const SPR = 16;  // sprite size in pixels
+  const DRAW_SIZE = SPR * SCALE; // = 48px
+
+  let W, H;
+  let gameActive = false;
+  let kills = 0, bestKills = parseInt(localStorage.getItem('jomer-best')||'0');
+  let hp = 3;
+  let frameTimer = 0;
+  let animTick = 0;
+  let explosions = [];
+  let floatTexts = [];
+  let lastTime = 0;
+
+  // Champion state
+  const champ = {
+    x: 0, y: 0,
+    state: 'idle', // idle | running | combat | slash | retreating | dead
+    frame: 0,
+    frameTimer: 0,
+    targetX: 0,
+    slowTimer: 0,
+    slashTimer: 0,
+    invincible: 0,
+    blinkTimer: 0,
+    flashTimer: 0
+  };
+
+  // Dummy state (shown before game starts)
+  const dummy = { x: 0, y: 0 };
+
+  // Enemies
+  let enemies = [];
+  let spawnTimer = 0;
+  let spawnInterval = 240; // frames between spawns
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = 160;
+    // Ground level: sprite feet at H - 48px (ground stripe)
+    champ.y = H - DRAW_SIZE - 4;
+    dummy.x = 60;
+    dummy.y = H - DRAW_SIZE - 4;
+    if(!gameActive) {
+      champ.x = 60 - DRAW_SIZE - 8;
+      champ.state = 'idle';
+    }
+  }
+
+  function startGame() {
+    if(gameActive) return;
+    gameActive = true;
+    hp = 3;
+    kills = 0;
+    enemies = [];
+    explosions = [];
+    floatTexts = [];
+    spawnTimer = 120;
+    spawnInterval = 240;
+    champ.state = 'running';
+    champ.x = 60;
+    champ.y = H - DRAW_SIZE - 4;
+    champ.targetX = W * 0.45;
+    champ.invincible = 0;
+    champ.slowTimer = 0;
+    champ.slashTimer = 0;
+    champ.frame = 0;
+    gameUI.classList.add('active');
+    gamePrompt.style.display = 'none';
+    updateUI();
+  }
+
+  function endGame() {
+    gameActive = false;
+    if(kills > bestKills){ bestKills = kills; localStorage.setItem('jomer-best', bestKills); }
+    floatTexts.push(createFloatText(W/2, H*0.3, 'GAME OVER!', '#FF3333'));
+    floatTexts.push(createFloatText(W/2, H*0.3 + 24, `KILLS: ${kills}`, '#FFD700'));
+    setTimeout(()=>{
+      gameUI.classList.remove('active');
+      gamePrompt.style.display = '';
+      gamePrompt.textContent = `✦ DEFEATED! BEST: ${bestKills} · CLICK TO RETRY ✦`;
+      champ.state = 'idle';
+      champ.x = 60 - DRAW_SIZE - 8;
+      enemies = [];
+    }, 2500);
+  }
+
+  function updateUI() {
+    const hearts = '❤️'.repeat(hp) + '🖤'.repeat(Math.max(0,3-hp));
+    hpDisplay.textContent = hearts;
+    killDisplay.textContent = kills;
+    bestDisplay.textContent = bestKills;
+  }
+
+  function spawnEnemy() {
+    const types = ['slime','skeleton'];
+    const type = types[Math.floor(Math.random()*types.length)];
+    enemies.push({
+      type,
+      x: W + DRAW_SIZE,
+      y: H - DRAW_SIZE - 4,
+      vx: -(1.2 + Math.random()*0.8 + kills*0.04),
+      frame: 0,
+      frameTimer: 0,
+      state: 'alive',
+      deathTimer: 0,
+      hp: type === 'skeleton' ? 2 : 1
+    });
+  }
+
+  function flashScreen(color) {
+    attackFlash.style.background = color || 'rgba(255,200,0,0.22)';
+    attackFlash.style.opacity = 1;
+    setTimeout(()=>{ attackFlash.style.opacity = 0; }, 120);
+  }
+
+  function update(dt) {
+    if(!gameActive) return;
+
+    animTick++;
+    spawnTimer--;
+    if(spawnTimer <= 0) {
+      spawnEnemy();
+      spawnTimer = Math.max(80, spawnInterval - kills * 3);
+    }
+
+    // ── CHAMPION LOGIC ──
+    if(champ.state !== 'dead') {
+      champ.frameTimer++;
+
+      // Slow drift: sometimes champion drifts backward
+      if(champ.slowTimer > 0) {
+        champ.slowTimer--;
+        champ.x -= 0.25;
+        champ.x = Math.max(20, champ.x);
+      }
+
+      // Running toward target
+      if(champ.state === 'running' || champ.state === 'retreating') {
+        const speed = champ.state === 'retreating' ? 0.5 : 1.8;
+        const dx = champ.targetX - champ.x;
+        if(Math.abs(dx) > 2) {
+          champ.x += Math.sign(dx) * speed;
+        } else {
+          champ.state = 'combat';
+          champ.frame = 0;
+          // Randomly trigger slow retreat
+          if(Math.random() < 0.3) {
+            champ.slowTimer = 60 + Math.floor(Math.random()*80);
+          }
+        }
+      }
+
+      // Slash timer
+      if(champ.slashTimer > 0) {
+        champ.slashTimer--;
+        if(champ.slashTimer === 0 && champ.state === 'slash') {
+          champ.state = 'combat';
+        }
+      }
+
+      // Invincibility frames
+      if(champ.invincible > 0) champ.invincible--;
+    }
+
+    // ── ENEMY LOGIC ──
+    for(let i = enemies.length-1; i>=0; i--) {
+      const e = enemies[i];
+      if(e.state === 'dead') {
+        e.deathTimer--;
+        if(e.deathTimer <= 0) enemies.splice(i, 1);
+        continue;
+      }
+
+      e.frameTimer++;
+      e.x += e.vx;
+
+      // Enemy reaches champion
+      if(e.x <= champ.x + DRAW_SIZE * 0.8 && champ.state !== 'dead') {
+        // Champion slashes!
+        if(champ.state === 'combat' || champ.state === 'slash') {
+          champ.state = 'slash';
+          champ.slashTimer = 20;
+          champ.frame = 0;
+          e.hp--;
+          if(e.hp <= 0) {
+            e.state = 'dead';
+            e.deathTimer = 30;
+            explosions.push(...createExplosion(e.x + DRAW_SIZE/2, e.y + DRAW_SIZE/2));
+            floatTexts.push(createFloatText(e.x, e.y - 10, '+1', '#FFD700'));
+            kills++;
+            updateUI();
+            flashScreen('rgba(255,220,0,0.18)');
+            // Advance champion
+            champ.targetX = Math.min(W * 0.55, champ.x + 30);
+            champ.state = 'running';
+          } else {
+            floatTexts.push(createFloatText(e.x, e.y - 10, 'HIT!', '#FF8800'));
+            e.vx *= 0.5; // slow enemy on hit
+          }
+        }
+        // Enemy hits champion (if champion not invincible and not slashing)
+        else if(champ.invincible <= 0) {
+          hp--;
+          champ.invincible = 90;
+          updateUI();
+          flashScreen('rgba(255,0,0,0.25)');
+          floatTexts.push(createFloatText(champ.x, champ.y - 10, '-1 HP', '#FF3333'));
+          e.state = 'dead';
+          e.deathTimer = 20;
+          if(hp <= 0) {
+            champ.state = 'dead';
+            setTimeout(endGame, 1200);
+          } else {
+            // Push champion back
+            champ.x -= 30;
+            champ.x = Math.max(20, champ.x);
+            champ.targetX = Math.max(60, champ.x - 20);
+            champ.state = 'retreating';
+          }
+        }
+      }
+
+      // Enemy escapes off left
+      if(e.x < -DRAW_SIZE) {
+        enemies.splice(i, 1);
+        if(champ.state !== 'dead' && champ.invincible <= 0) {
+          hp = Math.max(0, hp-1);
+          updateUI();
+          if(hp <= 0) { champ.state = 'dead'; setTimeout(endGame, 1200); }
+        }
+      }
+    }
+
+    // ── EXPLOSIONS ──
+    for(let i=explosions.length-1;i>=0;i--) {
+      const p = explosions[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 0.06;
+      if(p.life <= 0) explosions.splice(i,1);
+    }
+
+    // ── FLOAT TEXTS ──
+    for(let i=floatTexts.length-1;i>=0;i--) {
+      const t = floatTexts[i];
+      t.y += t.vy; t.life -= 0.025;
+      if(t.life <= 0) floatTexts.splice(i,1);
+    }
+  }
+
+  function getChampFrame() {
+    const tick = Math.floor(animTick / 8) % 2;
+    switch(champ.state) {
+      case 'idle': return SPRITES.champion.idle;
+      case 'running': return tick === 0 ? SPRITES.champion.run1 : SPRITES.champion.run2;
+      case 'retreating': return tick === 0 ? SPRITES.champion.run1 : SPRITES.champion.run2;
+      case 'combat': return tick === 0 ? SPRITES.champion.run1 : SPRITES.champion.run2;
+      case 'slash': return Math.floor(animTick/5)%2===0 ? SPRITES.champion.slash1 : SPRITES.champion.slash2;
+      case 'dead': return SPRITES.champion.idle;
+      default: return SPRITES.champion.idle;
+    }
+  }
+
+  function getEnemyFrame(e) {
+    const tick = Math.floor(animTick / 10) % 2;
+    const sp = SPRITES[e.type];
+    if(e.type === 'slime') return tick===0 ? sp.frame1 : sp.frame2;
+    if(e.type === 'skeleton') return tick===0 ? sp.frame1 : sp.frame2;
+    return sp.frame1;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    if(!gameActive) {
+      // Draw dummy
+      renderSprite(ctx, SPRITES.dummy.frame, SPRITES.dummy.palette, dummy.x, dummy.y, SCALE, false);
+      // Draw champion idle (training)
+      renderSprite(ctx, SPRITES.champion.idle, SPRITES.champion.palette, champ.x, champ.y, SCALE, false);
+      return;
+    }
+
+    // ── Draw champion ──
+    const shouldBlink = champ.invincible > 0 && Math.floor(animTick/4)%2===0;
+    if(champ.state !== 'dead' && !shouldBlink) {
+      renderSprite(ctx, getChampFrame(), SPRITES.champion.palette, champ.x, champ.y, SCALE, false);
+    } else if(champ.state === 'dead') {
+      ctx.globalAlpha = 0.4;
+      renderSprite(ctx, SPRITES.champion.idle, SPRITES.champion.palette, champ.x, champ.y+8, SCALE, false);
+      ctx.globalAlpha = 1;
+    }
+
+    // ── Draw enemies (flipped, facing left) ──
+    enemies.forEach(e => {
+      if(e.state === 'dead') {
+        ctx.globalAlpha = 0.3;
+        renderSprite(ctx, getEnemyFrame(e), SPRITES[e.type].palette, e.x, e.y+10, SCALE, true);
+        ctx.globalAlpha = 1;
+      } else {
+        renderSprite(ctx, getEnemyFrame(e), SPRITES[e.type].palette, e.x, e.y, SCALE, true);
       }
     });
-  }, { threshold: 0.1 });
-  panels.forEach(p=>{ p.style.animationPlayState='paused'; obs.observe(p); });
+
+    // ── Draw slash effect ──
+    if(champ.state === 'slash') {
+      const sx = champ.x + DRAW_SIZE + 4;
+      const sy = champ.y + DRAW_SIZE * 0.3;
+      ctx.save();
+      ctx.globalAlpha = 0.7;
+      const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 30);
+      grad.addColorStop(0, '#FFFFFF');
+      grad.addColorStop(0.3, '#FFD700');
+      grad.addColorStop(1, 'rgba(255,200,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 28, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ── Draw explosions ──
+    explosions.forEach(p => {
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    });
+    ctx.globalAlpha = 1;
+
+    // ── Draw float texts ──
+    floatTexts.forEach(t => {
+      ctx.save();
+      ctx.globalAlpha = t.life;
+      ctx.fillStyle = t.color;
+      ctx.font = 'bold 14px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#000';
+      ctx.fillText(t.text, t.x + 1, t.y + 1);
+      ctx.fillStyle = t.color;
+      ctx.fillText(t.text, t.x, t.y);
+      ctx.restore();
+    });
+  }
+
+  function loop(ts) {
+    const dt = ts - lastTime;
+    lastTime = ts;
+    update(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // ── CLICK / TOUCH TRIGGER ──
+  function handleClick(e) {
+    // Don't trigger if clicking on a link/button
+    if(e.target.closest('a,button,.panel,.chest,.cert-card,header,footer,nav')) return;
+    if(!gameActive) {
+      startGame();
+    }
+  }
+
+  bgZone.addEventListener('click', handleClick);
+  bgZone.addEventListener('touchstart', (e) => {
+    if(!gameActive) { e.preventDefault(); startGame(); }
+  }, { passive: false });
+
+  // Also allow clicking on the main background
+  document.addEventListener('click', (e) => {
+    if(e.target === document.body || e.target === document.documentElement) handleClick(e);
+  });
+
+  resize();
+  window.addEventListener('resize', resize);
+  bestDisplay.textContent = bestKills;
+  requestAnimationFrame(loop);
 })();
 </script>
 </body>
