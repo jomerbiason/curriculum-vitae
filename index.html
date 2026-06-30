@@ -1604,8 +1604,11 @@ function debounce(fn, wait){
     carBobPhase += 0.25;
     const cx = W * 0.5;
     const bob = Math.sin(carBobPhase) * 1.2;
-    const cy = groundY - 2 + bob;
     const ps = S * 1.7; // car pixel scale
+    // Wheel bottom sits at local y = ps*1.6 (wheel center) + ps*1.5 (wheel radius) = ps*3.1.
+    // Anchor cy so that point lands exactly on groundY — the same baseline trees and lamp posts use —
+    // instead of the old fixed "-2" offset, which left the car sunk ~14px into the road.
+    const cy = groundY - ps*3.1 + bob;
 
     ctx.save();
     ctx.translate(cx, cy);
