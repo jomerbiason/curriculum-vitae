@@ -1,5 +1,7 @@
 # Interactive RPG Portfolio
 
+🔗 **Live Site:** [jomerbiason.github.io/curriculum-vitae](https://jomerbiason.github.io/curriculum-vitae/)
+
 An interactive portfolio website built using vanilla HTML, CSS, and JavaScript.
 
 Unlike a traditional portfolio, this project combines front-end engineering techniques with game-inspired UI/UX, procedural canvas rendering, and lightweight animation systems without relying on external frameworks.
