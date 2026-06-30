@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="description" content="Jomer Antoniego Biason — MIS Assistant, Tech Support, Station Head.">
+<meta name="description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, IT Support, Web Developer.">
 <title>Jomer Biason | Portfolio</title>
 <link rel="icon" href="https://github.com/jomerbiason.png"/>
 <style>
@@ -149,28 +149,50 @@ body {
   opacity: 0.7;
 }
 
-/* ── GROUND ── */
+/* ── ROAD ── */
+:root { --asphalt-day: #4a4a52; --asphalt-night: #1a1a22; }
 .ground-stripe {
   position: fixed;
   bottom: 0; left: 0;
   width: 100%; height: 48px;
   z-index: 1;
   pointer-events: none;
-  background:
+  background-color: var(--asphalt-day);
+  background-image:
+    linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 30%),
     repeating-linear-gradient(90deg,
-      var(--ground) 0px, var(--ground) 16px,
-      color-mix(in srgb, var(--ground) 80%, #000) 16px,
-      color-mix(in srgb, var(--ground) 80%, #000) 32px
+      #f4d35e 0px, #f4d35e 28px,
+      transparent 28px, transparent 56px
     );
-  border-top: 4px solid color-mix(in srgb, var(--ground) 60%, #000);
-  transition: background 1.2s, border-color 1.2s;
+  background-position: 0 0, 0 22px;
+  background-size: auto, 56px 6px;
+  background-repeat: repeat, repeat-x;
+  border-top: 4px solid #2c2c34;
+  transition: background-color 1.2s, border-color 1.2s;
+  animation: roadScroll 1.4s linear infinite;
+}
+[data-theme="night"] .ground-stripe {
+  background-color: var(--asphalt-night);
+  background-image:
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 0%, transparent 30%),
+    repeating-linear-gradient(90deg,
+      #d8c060 0px, #d8c060 28px,
+      transparent 28px, transparent 56px
+    );
+}
+@keyframes roadScroll {
+  from { background-position: 0 0, 0 22px; }
+  to   { background-position: -56px 0, -56px 22px; }
 }
 .ground-stripe::before {
   content:'';
   position: absolute;
   top: -8px; left: 0;
   width: 100%; height: 8px;
-  background: color-mix(in srgb, var(--ground) 110%, #fff 20%);
+  background: color-mix(in srgb, var(--asphalt-day) 130%, #fff 15%);
+}
+[data-theme="night"] .ground-stripe::before {
+  background: color-mix(in srgb, var(--asphalt-night) 160%, #fff 8%);
 }
 .ground-stripe::after {
   content:'';
@@ -403,8 +425,8 @@ footer a { color: var(--link); }
   <section class="hero">
     <div class="hero-avatar" aria-hidden="true">⚔️</div>
     <div class="hero-text">
-      <h1>JOMER BIASON</h1>
-      <div class="subtitle">MIS Assistant · Tech Support · Station Head</div>
+      <h1>JOMER<br>BIASON</h1>
+      <div class="subtitle">MIS Assistant · IT Support · Web Dev</div>
       <div class="subtitle" style="font-size:15px; opacity:0.7;">📍 Cavite / Metro Manila, PH</div>
       <div class="open-badge">▶ OPEN TO WORK</div>
     </div>
@@ -414,7 +436,7 @@ footer a { color: var(--link); }
     <div class="panel">
       <div class="panel-title">CAREER QUEST</div>
       <div class="dialogue">
-        <div class="dialogue-name">ABOUT ME:</div>
+        <div class="dialogue-name">JOMER SAYS:</div>
         I'm a tech enthusiast with a background in MIS and IT support.
         I love simplifying complex tasks and finding efficient solutions.
         Currently seeking a fast-paced role where I can be a helpful team player,
@@ -511,6 +533,12 @@ footer a { color: var(--link); }
           <div class="chest-name">MINESWEEPER CLASSIC</div>
           <div class="chest-desc">Polished browser Minesweeper with difficulty levels, millisecond timer, and touch controls.</div>
           <a href="https://jomerbiason.github.io/minesweeper-classic/" target="_blank" class="chest-link">▶ PLAY GAME</a>
+        </div>
+        <div class="chest">
+          <div class="chest-icon">🌐</div>
+          <div class="chest-name">CURRICULUM VITAE</div>
+          <div class="chest-desc">This portfolio site — responsive, animated, with dark mode and downloadable CV.</div>
+          <a href="https://jomerbiason.github.io/curriculum-vitae/" target="_blank" class="chest-link">▶ VISIT SITE</a>
         </div>
       </div>
     </div>
@@ -609,6 +637,7 @@ footer a { color: var(--link); }
 
 <footer>
   <div>© 2026 JOMER ANTONIEGO BIASON · ALL RIGHTS RESERVED</div>
+  <div style="margin-top:6px; opacity:0.6;">PRESS START TO HIRE ▶</div>
 </footer>
 
 <script>
@@ -717,11 +746,16 @@ footer a { color: var(--link); }
     for(let i=0;i<count;i++){
       // bias roughly a third of clouds toward the sun/moon's vertical band so they pass in front of it
       const throughSun = i % 3 === 0;
+      // random size tier: small / medium / big pixel clouds
+      const sizeRoll = Math.random();
+      const sizeTier = sizeRoll < 0.35 ? (0.5 + Math.random()*0.4)   // small
+                      : sizeRoll < 0.75 ? (1.0 + Math.random()*0.6)  // medium
+                      : (1.8 + Math.random()*1.4);                   // big
       clouds.push({
         x: Math.random() * (W + 300) - 150,
         y: throughSun ? cel.y + (Math.random()-0.5) * cel.r * 1.6 : H * (0.04 + Math.random() * 0.4),
         shape: SHAPES[Math.floor(Math.random()*SHAPES.length)],
-        scale: throughSun ? 1.2 + Math.random()*1.4 : 0.8 + Math.random() * 1.3,
+        scale: throughSun ? Math.max(sizeTier, 1.2) : sizeTier,
         speed: 0.05 + Math.random() * 0.16,
         depth: Math.random(), // affects opacity/size for parallax
       });
@@ -759,13 +793,168 @@ footer a { color: var(--link); }
     ctx.restore();
   }
 
+  /* ─────────────────── HOT AIR BALLOON (right → left, daytime only) ─────────────────── */
+  let balloon = null;
+  let balloonSpawnTimer = 260 + Math.random()*340;
+
+  function spawnBalloon(){
+    const colorsPairs = [['#e6483f','#f4d35e'],['#5fb24a','#f0e6c8'],['#3b6fd4','#ffd24a'],['#9b51c4','#ffe6a8']];
+    return {
+      x: W + 80,
+      y: H * (0.1 + Math.random()*0.22),
+      speed: 0.45 + Math.random()*0.3,
+      bobPhase: Math.random()*Math.PI*2,
+      colors: colorsPairs[Math.floor(Math.random()*colorsPairs.length)],
+    };
+  }
+
+  function drawBalloon(b, night){
+    b.bobPhase += 0.02;
+    const bob = Math.sin(b.bobPhase) * 4;
+    const ps = 2.6;
+    ctx.save();
+    ctx.translate(b.x, b.y + bob);
+
+    const [c1, c2] = b.colors;
+    // balloon panels (alternating stripes)
+    for(let i=-3;i<=3;i++){
+      ctx.fillStyle = (i % 2 === 0) ? c1 : c2;
+      const w = ps*1.8 - Math.abs(i)*ps*0.15;
+      ctx.fillRect(i*ps*1.8, -ps*7 + Math.abs(i)*ps*0.4, w, ps*9 - Math.abs(i)*ps*0.8);
+    }
+    if(night){
+      ctx.fillStyle = 'rgba(10,10,20,0.35)';
+      ctx.fillRect(-ps*6.3, -ps*7, ps*12.6, ps*9);
+    }
+    // basket lines
+    ctx.strokeStyle = '#5a3a1f';
+    ctx.lineWidth = ps*0.3;
+    ctx.beginPath(); ctx.moveTo(-ps*2.2, ps*2); ctx.lineTo(-ps*1.4, ps*4.2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ps*2.2, ps*2); ctx.lineTo(ps*1.4, ps*4.2); ctx.stroke();
+    // basket
+    ctx.fillStyle = '#7a4a24';
+    ctx.fillRect(-ps*1.6, ps*4.2, ps*3.2, ps*1.8);
+    ctx.restore();
+  }
+
+  /* ─────────────────── AERIAL ADVERTISING PLANE ─────────────────── */
+  const AD_MESSAGES = ['THANK YOU FOR THE VISIT'];
+  let adPlane = null;
+  let adSpawnTimer = 1800; // ~30s at 60fps
+  let adMsgIndex = 0;
+
+  function spawnAdPlane(){
+    const msg = AD_MESSAGES[adMsgIndex % AD_MESSAGES.length];
+    adMsgIndex++;
+    return {
+      x: -260,
+      y: H * (0.16 + Math.random()*0.14),
+      speed: 1.1 + Math.random()*0.3,
+      message: msg,
+    };
+  }
+
+  function drawAdPlane(p, night){
+    const ps = 2.0;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    // tow line
+    ctx.strokeStyle = night ? 'rgba(220,220,220,0.4)' : 'rgba(60,60,60,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-ps*5, 0); ctx.lineTo(-ps*9, 0); ctx.stroke();
+
+    const bodyColor = night ? '#cfd6e0' : '#f4f4f4';
+    const shadeColor = night ? '#8fa0b8' : '#c43b3b';
+
+    // fuselage
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(-ps*5, -ps*0.8, ps*9.5, ps*1.6);
+    // nose taper
+    ctx.beginPath();
+    ctx.moveTo(ps*4.5, -ps*0.8);
+    ctx.lineTo(ps*6.4, 0);
+    ctx.lineTo(ps*4.5, ps*0.8);
+    ctx.closePath();
+    ctx.fill();
+    // propeller blur at nose tip
+    ctx.fillStyle = night ? 'rgba(200,200,210,0.5)' : 'rgba(80,80,80,0.55)';
+    ctx.fillRect(ps*6.3, -ps*2.0, ps*0.5, ps*4.0);
+
+    // low wing (main wing crossing the fuselage)
+    ctx.fillStyle = shadeColor;
+    ctx.fillRect(-ps*1.2, -ps*0.1, ps*4.6, ps*0.7);
+    ctx.fillRect(-ps*1.0, -ps*2.6, ps*1.0, ps*2.5);  // wing reaching up (top view hint)
+
+    // tail fin (vertical stabilizer)
+    ctx.fillStyle = shadeColor;
+    ctx.fillRect(-ps*5.6, -ps*2.2, ps*1.4, ps*1.5);
+    // tail wing (horizontal stabilizer)
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(-ps*5.8, -ps*0.15, ps*2.0, ps*0.5);
+
+    // cockpit window
+    ctx.fillStyle = night ? 'rgba(180,220,255,0.5)' : 'rgba(140,200,255,0.85)';
+    ctx.fillRect(ps*1.4, -ps*0.55, ps*1.6, ps*0.9);
+
+    // banner
+    ctx.font = "10px 'Press Start 2P', monospace";
+    const textW = ctx.measureText(p.message).width;
+    const bannerW = textW + ps*8;
+    const bannerH = ps*5;
+    const bx = -ps*9 - bannerW;
+    const by = -bannerH/2;
+
+    ctx.fillStyle = night ? 'rgba(20,20,30,0.85)' : 'rgba(255,255,255,0.92)';
+    ctx.fillRect(bx, by, bannerW, bannerH);
+    ctx.strokeStyle = night ? '#00ff88' : '#8B6914';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bx, by, bannerW, bannerH);
+
+    ctx.fillStyle = night ? '#aaffcc' : '#1a1a2e';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(p.message, bx + ps*4, by + bannerH/2 + 1);
+
+    ctx.restore();
+  }
   function loop(){
     ctx.clearRect(0,0,W,H);
     const night = isNight();
 
-    // sun/moon drawn first, clouds drawn on top so they visually pass in front of it
+    // sun/moon drawn first
     drawCelestial(night);
 
+    // hot air balloon (right → left, daytime only)
+    if(night){
+      balloon = null;
+    } else {
+      balloonSpawnTimer--;
+      if(!balloon && balloonSpawnTimer <= 0){
+        balloon = spawnBalloon();
+      }
+      if(balloon){
+        balloon.x -= balloon.speed;
+        drawBalloon(balloon, night);
+        if(balloon.x < -100){ balloon = null; balloonSpawnTimer = 320 + Math.random()*400; }
+      }
+    }
+
+    // aerial advertising plane (left → right, daytime only, towing a banner)
+    if(night){
+      adPlane = null;
+    } else {
+      adSpawnTimer--;
+      if(!adPlane && adSpawnTimer <= 0){
+        adPlane = spawnAdPlane();
+      }
+      if(adPlane){
+        adPlane.x += adPlane.speed;
+        drawAdPlane(adPlane, night);
+        if(adPlane.x > W + 400){ adPlane = null; adSpawnTimer = 1800; } // ~30s at 60fps
+      }
+    }
+
+    // clouds drawn last so they visually pass in front of the sun, balloon, and banner plane
     clouds.forEach(c => {
       // right → left drift
       c.x -= c.speed * (0.4 + c.depth) * 1.6;
@@ -893,33 +1082,52 @@ footer a { color: var(--link); }
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
     placeTrees();
+    placeLamps();
     if(typeof initButterflies === 'function' && butterflies && butterflies.length) initButterflies();
     if(typeof initWisps === 'function' && wisps && wisps.length) initWisps();
   }
 
   function isNight(){ return document.documentElement.getAttribute('data-theme') === 'night'; }
 
-  /* ─────────────────── TREES ─────────────────── */
-  // Each tree: { x, groundY, swayPhase, swaySpeed, scale }
+  /* ─────────────────── TREES (scrolling right → left) ─────────────────── */
+  // Each tree: { x, groundY, swayPhase, swaySpeed, scale, speed }
   let trees = [];
 
-  function placeTrees(){
-    // Ground top = bottom of screen - 48px (ground stripe)
-    const groundTop = H - 48;
-    // Spread trees across screen width, avoid center
-    const treeXPositions = [];
-    const count = Math.max(4, Math.floor(W / 220));
-    for(let i=0;i<count;i++){
-      treeXPositions.push( Math.round( (i + 0.5) * (W / count) ) );
-    }
-    // Re-use existing phases if possible so trees don't reset on resize
-    trees = treeXPositions.map((x, i) => ({
-      x,
+  function spawnTree(groundTop, fromInit){
+    const depth = Math.random(); // 0 = far/slow/small, 1 = near/fast/big
+    return {
+      x: fromInit ? Math.random() * (W + 300) : W + 60 + Math.random()*200,
       groundY: groundTop,
-      swayPhase: trees[i] ? trees[i].swayPhase : Math.random() * Math.PI * 2,
+      swayPhase: Math.random() * Math.PI * 2,
       swaySpeed: 0.008 + Math.random() * 0.006,
-      scale: 0.85 + Math.random() * 0.35,
-    }));
+      scale: 0.65 + depth * 0.65,
+      speed: 0.35 + depth * 0.9,
+    };
+  }
+
+  function placeTrees(){
+    const groundTop = H - 48;
+    const count = Math.max(5, Math.floor(W / 200));
+    trees = [];
+    for(let i=0;i<count;i++) trees.push(spawnTree(groundTop, true));
+  }
+
+  /* ─────────────────── LAMP POSTS (scrolling right → left) ─────────────────── */
+  let lamps = [];
+  function spawnLamp(groundTop, fromInit){
+    return {
+      x: fromInit ? Math.random() * (W + 400) : W + 80 + Math.random()*260,
+      groundY: groundTop,
+      scale: 0.9 + Math.random()*0.3,
+      speed: 0.9, // matches near-road parallax speed
+      flicker: Math.random()*Math.PI*2,
+    };
+  }
+  function placeLamps(){
+    const groundTop = H - 48;
+    const count = Math.max(2, Math.floor(W / 420));
+    lamps = [];
+    for(let i=0;i<count;i++) lamps.push(spawnLamp(groundTop, true));
   }
 
   /* Draw one pixel-art tree.
@@ -1259,6 +1467,255 @@ footer a { color: var(--link); }
     });
   }
 
+  /* ─────────────────── LAMP POST ─────────────────── */
+  function drawLamp(x, groundY, sc, night, flicker){
+    ctx.save();
+    ctx.translate(x, groundY);
+    const ps = S * sc * 0.5;
+    // pole
+    ctx.fillStyle = night ? '#222230' : '#3a3a3a';
+    ctx.fillRect(-ps*0.4, -ps*16, ps*0.8, ps*16);
+    // base
+    ctx.fillStyle = night ? '#1a1a26' : '#2c2c2c';
+    ctx.fillRect(-ps*1.2, -ps*1.2, ps*2.4, ps*1.2);
+    // arm
+    ctx.fillRect(-ps*0.4, -ps*16, ps*4.2, ps*0.7);
+    // lamp head
+    const lampX = ps*3.4, lampY = -ps*16;
+    ctx.fillStyle = night ? '#3a3520' : '#555';
+    ctx.fillRect(lampX-ps*1.1, lampY-ps*0.2, ps*2.2, ps*1.6);
+    if(night){
+      const glowA = 0.55 + Math.sin(flicker)*0.12;
+      const grad = ctx.createRadialGradient(lampX, lampY+ps*0.6, 0, lampX, lampY+ps*0.6, ps*9);
+      grad.addColorStop(0, `rgba(255,224,140,${glowA})`);
+      grad.addColorStop(1, 'rgba(255,224,140,0)');
+      ctx.beginPath(); ctx.arc(lampX, lampY+ps*0.6, ps*9, 0, Math.PI*2); ctx.fillStyle = grad; ctx.fill();
+      ctx.fillStyle = `rgba(255,238,180,${0.85+Math.sin(flicker)*0.1})`;
+      ctx.fillRect(lampX-ps*0.7, lampY+ps*0.1, ps*1.4, ps*1.0);
+    } else {
+      ctx.fillStyle = '#888';
+      ctx.fillRect(lampX-ps*0.7, lampY+ps*0.1, ps*1.4, ps*1.0);
+    }
+    ctx.restore();
+  }
+
+  /* ─────────────────── CAR (illusion of forward motion) ─────────────────── */
+  let carWheelPhase = 0;
+  let carBobPhase = 0;
+
+  function drawCar(groundY, night){
+    carWheelPhase += 0.45;
+    carBobPhase += 0.25;
+    const cx = W * 0.5;
+    const bob = Math.sin(carBobPhase) * 1.2;
+    const cy = groundY - 2 + bob;
+    const ps = S * 1.7; // car pixel scale
+
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // motion streak lines behind the car (reinforces forward illusion)
+    ctx.fillStyle = night ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.35)';
+    for(let i=0;i<3;i++){
+      const sx = -ps*7.5 - i*ps*3 - (carWheelPhase*1.3 % (ps*3));
+      ctx.fillRect(sx, -ps*1.2 + i*ps*1.4, ps*2.4, ps*0.5);
+    }
+
+    // car shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath();
+    ctx.ellipse(0, ps*1.6, ps*7, ps*1.1, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    // body colors
+    const bodyColor = night ? '#b23b3b' : '#e6483f';
+    const bodyShade = night ? '#7a2424' : '#b9332b';
+    const windowColor = night ? 'rgba(180,220,255,0.55)' : 'rgba(180,220,255,0.85)';
+
+    // lower body
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(-ps*7, -ps*1.6, ps*14, ps*2.0);
+    // upper cabin
+    ctx.fillRect(-ps*4.2, -ps*3.4, ps*8.4, ps*1.9);
+    // shading strip
+    ctx.fillStyle = bodyShade;
+    ctx.fillRect(-ps*7, -ps*0.1, ps*14, ps*0.6);
+    // windows
+    ctx.fillStyle = windowColor;
+    ctx.fillRect(-ps*3.6, -ps*3.0, ps*3.1, ps*1.4);
+    ctx.fillRect(ps*0.5, -ps*3.0, ps*3.1, ps*1.4);
+    // headlight / taillight pixels
+    ctx.fillStyle = night ? '#fff3b0' : '#fff7d6';
+    ctx.fillRect(ps*6.3, -ps*0.9, ps*0.8, ps*0.7);
+    ctx.fillStyle = '#aa1f1f';
+    ctx.fillRect(-ps*7, -ps*0.9, ps*0.8, ps*0.7);
+
+    if(night){
+      // headlight beam glow
+      const beam = ctx.createRadialGradient(ps*7, -ps*0.5, 0, ps*7, -ps*0.5, ps*9);
+      beam.addColorStop(0, 'rgba(255,243,176,0.45)');
+      beam.addColorStop(1, 'rgba(255,243,176,0)');
+      ctx.beginPath(); ctx.arc(ps*7, -ps*0.5, ps*9, 0, Math.PI*2); ctx.fillStyle = beam; ctx.fill();
+    }
+
+    // wheels — rotating spokes sell the "moving" illusion even though the car is stationary
+    const drawWheel = (wx) => {
+      ctx.save();
+      ctx.translate(wx, ps*1.6);
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.arc(0,0,ps*1.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#555';
+      ctx.beginPath(); ctx.arc(0,0,ps*0.7,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = ps*0.35;
+      for(let i=0;i<4;i++){
+        const a = carWheelPhase*0.3 + i*(Math.PI/2);
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.lineTo(Math.cos(a)*ps*1.3, Math.sin(a)*ps*1.3);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+    drawWheel(-ps*4.3);
+    drawWheel(ps*4.3);
+
+    ctx.restore();
+  }
+
+  /* ─────────────────── ONCOMING TRAFFIC (left → right, opposite lane) ─────────────────── */
+  let traffic = [];
+  let trafficSpawnTimer = 60 + Math.random()*80;
+
+  function spawnTraffic(groundTop){
+    const roll = Math.random();
+    const type = roll < 0.5 ? 'car' : roll < 0.8 ? 'motorcycle' : 'bus';
+    const speedMap = { car: 2.4 + Math.random()*1.0, motorcycle: 3.4 + Math.random()*1.4, bus: 1.6 + Math.random()*0.5 };
+    const hueMap = ['#3b6fd4','#5fb24a','#d4a83b','#9b51c4','#d4573b'];
+    return {
+      type,
+      x: -140,
+      groundY: groundTop,
+      speed: speedMap[type],
+      color: hueMap[Math.floor(Math.random()*hueMap.length)],
+      wheelPhase: Math.random()*Math.PI*2,
+      laneOffset: -10, // slightly farther lane than the main car so it reads as oncoming
+      scale: type === 'bus' ? 1.05 : type === 'motorcycle' ? 0.7 : 0.85,
+    };
+  }
+
+  function drawTrafficCar(v, night){
+    const ps = S * 1.45 * v.scale;
+    ctx.save();
+    ctx.translate(v.x, v.groundY + v.laneOffset);
+    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.ellipse(0, ps*1.5, ps*6.4, ps*1.0, 0, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = v.color;
+    ctx.fillRect(-ps*6.4, -ps*1.4, ps*12.8, ps*1.8);
+    ctx.fillRect(-ps*3.6, -ps*3.0, ps*7.2, ps*1.7);
+    ctx.fillStyle = night ? 'rgba(180,220,255,0.5)' : 'rgba(180,220,255,0.8)';
+    ctx.fillRect(-ps*3.0, -ps*2.7, ps*2.6, ps*1.2);
+    ctx.fillRect(ps*0.4, -ps*2.7, ps*2.6, ps*1.2);
+    // lights facing right (its direction of travel)
+    ctx.fillStyle = night ? '#fff3b0' : '#fff7d6';
+    ctx.fillRect(ps*5.8, -ps*0.9, ps*0.7, ps*0.6);
+    ctx.fillStyle = '#aa1f1f';
+    ctx.fillRect(-ps*6.4, -ps*0.9, ps*0.7, ps*0.6);
+    if(night){
+      const beam = ctx.createRadialGradient(ps*6.2, -ps*0.6, 0, ps*6.2, -ps*0.6, ps*7);
+      beam.addColorStop(0, 'rgba(255,243,176,0.35)');
+      beam.addColorStop(1, 'rgba(255,243,176,0)');
+      ctx.beginPath(); ctx.arc(ps*6.2, -ps*0.6, ps*7, 0, Math.PI*2); ctx.fillStyle = beam; ctx.fill();
+    }
+    const wheel = (wx) => {
+      ctx.save(); ctx.translate(wx, ps*1.4);
+      ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(0,0,ps*1.3,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#555'; ctx.beginPath(); ctx.arc(0,0,ps*0.55,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    };
+    wheel(-ps*3.8); wheel(ps*3.8);
+    ctx.restore();
+  }
+
+  function drawTrafficBus(v, night){
+    const ps = S * 1.45 * v.scale;
+    ctx.save();
+    ctx.translate(v.x, v.groundY + v.laneOffset);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.beginPath(); ctx.ellipse(0, ps*1.7, ps*9.5, ps*1.1, 0, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = v.color;
+    ctx.fillRect(-ps*9.6, -ps*4.2, ps*19.2, ps*5.4);
+    ctx.fillStyle = night ? 'rgba(180,220,255,0.45)' : 'rgba(180,220,255,0.8)';
+    for(let i=0;i<5;i++){
+      ctx.fillRect(-ps*8.6 + i*ps*3.5, -ps*3.4, ps*2.4, ps*1.5);
+    }
+    ctx.fillStyle = night ? '#fff3b0' : '#fff7d6';
+    ctx.fillRect(ps*8.9, -ps*0.6, ps*0.8, ps*0.7);
+    ctx.fillStyle = '#aa1f1f';
+    ctx.fillRect(-ps*9.6, -ps*0.6, ps*0.8, ps*0.7);
+    if(night){
+      const beam = ctx.createRadialGradient(ps*9.2, -ps*0.3, 0, ps*9.2, -ps*0.3, ps*8);
+      beam.addColorStop(0, 'rgba(255,243,176,0.32)');
+      beam.addColorStop(1, 'rgba(255,243,176,0)');
+      ctx.beginPath(); ctx.arc(ps*9.2, -ps*0.3, ps*8, 0, Math.PI*2); ctx.fillStyle = beam; ctx.fill();
+    }
+    const wheel = (wx) => {
+      ctx.save(); ctx.translate(wx, ps*1.6);
+      ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(0,0,ps*1.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#555'; ctx.beginPath(); ctx.arc(0,0,ps*0.6,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    };
+    wheel(-ps*6.0); wheel(ps*6.0);
+    ctx.restore();
+  }
+
+  function drawTrafficMoto(v, night){
+    const ps = S * 1.45 * v.scale;
+    ctx.save();
+    ctx.translate(v.x, v.groundY + v.laneOffset);
+    v.wheelPhase += 0.5;
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath(); ctx.ellipse(0, ps*1.5, ps*3.6, ps*0.8, 0, 0, Math.PI*2); ctx.fill();
+
+    // body
+    ctx.fillStyle = v.color;
+    ctx.fillRect(-ps*2.6, -ps*1.3, ps*5.2, ps*0.9);
+    // rider torso + helmet
+    ctx.fillStyle = night ? '#222' : '#333';
+    ctx.fillRect(-ps*0.5, -ps*3.0, ps*1.4, ps*1.8);
+    ctx.fillStyle = night ? '#444' : '#555';
+    ctx.beginPath(); ctx.arc(ps*0.1, -ps*3.1, ps*0.9, 0, Math.PI*2); ctx.fill();
+    // headlight
+    ctx.fillStyle = night ? '#fff3b0' : '#fff7d6';
+    ctx.fillRect(ps*2.3, -ps*0.9, ps*0.6, ps*0.5);
+    if(night){
+      const beam = ctx.createRadialGradient(ps*2.6, -ps*0.65, 0, ps*2.6, -ps*0.65, ps*5);
+      beam.addColorStop(0, 'rgba(255,243,176,0.4)');
+      beam.addColorStop(1, 'rgba(255,243,176,0)');
+      ctx.beginPath(); ctx.arc(ps*2.6, -ps*0.65, ps*5, 0, Math.PI*2); ctx.fillStyle = beam; ctx.fill();
+    }
+    const wheel = (wx) => {
+      ctx.save(); ctx.translate(wx, ps*1.4);
+      ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(0,0,ps*1.1,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#666'; ctx.lineWidth = ps*0.18;
+      for(let i=0;i<3;i++){
+        const a = v.wheelPhase + i*(Math.PI*2/3);
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*ps*0.9, Math.sin(a)*ps*0.9); ctx.stroke();
+      }
+      ctx.restore();
+    };
+    wheel(-ps*2.0); wheel(ps*2.0);
+    ctx.restore();
+  }
+
+  function drawTraffic(v, night){
+    if(v.type === 'bus') drawTrafficBus(v, night);
+    else if(v.type === 'motorcycle') drawTrafficMoto(v, night);
+    else drawTrafficCar(v, night);
+  }
+
   /* ─────────────────── MAIN LOOP ─────────────────── */
   function loop(){
     ctx.clearRect(0, 0, W, H);
@@ -1266,12 +1723,37 @@ footer a { color: var(--link); }
 
     const night = isNight();
 
-    /* Draw trees — behind everything, at ground level */
-    trees.forEach(t => {
+    /* Draw lamp posts — behind trees, along the road */
+    lamps.forEach((l, i) => {
+      l.x -= l.speed;
+      l.flicker += 0.08;
+      drawLamp(l.x, l.groundY, l.scale, night, l.flicker);
+      if(l.x < -60) lamps[i] = spawnLamp(l.groundY, false);
+    });
+
+    /* Draw trees — scrolling right → left, parallax by depth/speed */
+    trees.forEach((t, i) => {
+      t.x -= t.speed;
       t.swayPhase += t.swaySpeed;
       const swayAngle = Math.sin(t.swayPhase) * (night ? 0.04 : 0.025);
       drawTree(t.x, t.groundY, swayAngle, t.scale, night);
+      if(t.x < -80) trees[i] = spawnTree(t.groundY, false);
     });
+
+    /* Oncoming traffic — random car/bus/motorcycle drifting left → right, passing the main car's lane */
+    trafficSpawnTimer--;
+    if(trafficSpawnTimer <= 0 && traffic.length < 3){
+      traffic.push(spawnTraffic(H - 48));
+      trafficSpawnTimer = 90 + Math.random()*140;
+    }
+    traffic.forEach((v, i) => {
+      v.x += v.speed;
+      drawTraffic(v, night);
+      if(v.x > W + 160) traffic.splice(i, 1);
+    });
+
+    /* Car stays put in the lower-middle — scrolling road/trees/lamps sell the motion */
+    drawCar(H - 48, night);
 
     if(!night){
       /* ── DAY: birds + butterflies ── */
@@ -1320,6 +1802,7 @@ footer a { color: var(--link); }
   initBats();
   initButterflies();
   initWisps();
+  placeLamps();
   window.addEventListener('resize', resize);
   requestAnimationFrame(loop);
 })();
