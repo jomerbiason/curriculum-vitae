@@ -15,14 +15,16 @@ Browser
 │     ├── Semantic Layout
 │     ├── Navigation
 │     ├── Sections
-│     └── Accessibility
+│     ├── Accessibility
+│     └── SEO / Social Metadata
 │
 ├── CSS
 │     ├── Theme Engine
 │     ├── Pixel UI
 │     ├── Responsive Layout
 │     ├── Animations
-│     └── Component Styling
+│     ├── Component Styling
+│     └── Reduced-Motion Support
 │
 └── JavaScript
       ├── Theme Controller
@@ -31,7 +33,8 @@ Browser
       ├── Navigation Observer
       ├── RPG Minigame
       ├── State Management
-      └── UI Effects
+      ├── UI Effects
+      └── Contact Obfuscation
 ```
 
 ---
@@ -59,6 +62,9 @@ The project was designed around four objectives.
 | LocalStorage | Theme persistence and high score storage |
 | IntersectionObserver | Active navigation and lazy animations |
 | requestAnimationFrame | Smooth rendering loop |
+| matchMedia | Reduced-motion detection |
+| Open Graph / JSON-LD | Link previews and structured data for search engines |
+| Web App Manifest | Home-screen installability |
 
 ---
 
@@ -121,7 +127,7 @@ No duplicate stylesheets are required because every color is referenced through 
 
 # Canvas Rendering
 
-Three independent canvas layers are used.
+Multiple independent canvas layers are used.
 
 ## Stars Canvas
 
@@ -149,6 +155,19 @@ Features
 - Opacity decay
 
 This produces a lightweight atmospheric effect without using videos or GIFs.
+
+---
+
+## World Canvas
+
+Renders the scrolling background scene — trees, lamp posts, oncoming traffic, the foreground car, and time-of-day creatures (birds and butterflies by day, bats and mist wisps by night).
+
+Features
+
+- Parallax scrolling by depth
+- Procedural pixel-art trees with day/night variants
+- Stationary "moving" car illusion via scrolling road, streak lines, and spinning wheel spokes
+- Spawned oncoming traffic (cars, motorcycles, buses)
 
 ---
 
@@ -220,6 +239,8 @@ Primary techniques include
 - Opacity interpolation
 
 No animation libraries are used.
+
+All canvas-driven animation loops check `prefers-reduced-motion` on load and skip initialization entirely for visitors who have that preference enabled, in addition to disabling CSS keyframe animations (fog drift, badge blink, panel fade-in, road scroll) via a dedicated media query.
 
 ---
 
@@ -302,6 +323,8 @@ Several optimizations are included.
 - Hardware accelerated transforms
 - Local sprite rendering
 - No external JavaScript libraries
+- Debounced resize handling (150ms) across all canvas layers to avoid redundant re-initialization during window dragging
+- `prefers-reduced-motion` short-circuits canvas animation loops before they start, reducing CPU/battery usage for users who opt out of motion
 
 ---
 
@@ -316,6 +339,7 @@ Adaptations include
 - Typography scaling
 - Grid restructuring
 - Mobile spacing adjustments
+- Reduced-motion adaptations for users with vestibular or motion sensitivity
 
 ---
 
@@ -329,6 +353,38 @@ The project includes
 - Responsive scaling
 - Lazy loaded images
 - Descriptive alt attributes
+- `prefers-reduced-motion` support that disables decorative canvas/CSS animation
+- Keyboard-operable contact reveal controls (`role="button"`, `tabindex`, Enter/Space activation)
+
+---
+
+# Privacy & Contact Protection
+
+Reference contact emails are not present as plain text in the page source. Each reference's email is stored as separated `data-user` / `data-domain` attributes and is only assembled into a clickable `mailto:` link after an explicit click or keyboard activation, reducing exposure to automated email harvesters while keeping the information one tap away for real visitors.
+
+---
+
+# SEO & Social Sharing
+
+The site includes metadata so links shared on social platforms render as proper preview cards rather than bare URLs, and so search engines can parse the page as a professional profile.
+
+- Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`)
+- Twitter Card tags
+- JSON-LD `Person` structured data (name, job title, alumni info, social links)
+- `robots.txt` and `sitemap.xml` for crawler discovery
+- `theme-color` meta tag matching the site's pixel-header palette
+
+---
+
+# Progressive Web App Support
+
+A `manifest.json` is linked from the document head, allowing the portfolio to be added to a mobile home screen with a standalone display mode, themed splash color, and app icon.
+
+---
+
+# Error Handling
+
+A themed `404.html` page is served automatically by GitHub Pages for any unmatched route, styled consistently with the site's pixel/retro aesthetic and linking back to the live portfolio.
 
 ---
 
@@ -338,6 +394,10 @@ The project includes
 /
 │
 ├── index.html
+├── 404.html
+├── robots.txt
+├── sitemap.xml
+├── manifest.json
 ├── certs/
 ├── README.md
 ├── favicon
@@ -354,5 +414,6 @@ The project includes
 - Sprite editor
 - Procedural enemy AI
 - Save game system
-- PWA support
+- Full offline PWA support (service worker + asset caching)
 - TypeScript migration
+- Automated Lighthouse/accessibility CI checks
