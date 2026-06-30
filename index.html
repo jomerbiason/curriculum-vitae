@@ -6,6 +6,46 @@
 <meta name="description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, Tech Support, Station Head.">
 <title>Jomer Biason | Portfolio</title>
 <link rel="icon" href="https://github.com/jomerbiason.png"/>
+<meta name="theme-color" content="#3d2b1f"/>
+<link rel="manifest" href="manifest.json"/>
+
+<!-- Open Graph / link previews (LinkedIn, Messenger, Slack, etc.) -->
+<meta property="og:type" content="profile"/>
+<meta property="og:title" content="Jomer Biason | Portfolio"/>
+<meta property="og:description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, Tech Support, Station Head."/>
+<meta property="og:url" content="https://jomerbiason.github.io/curriculum-vitae/"/>
+<meta property="og:image" content="https://github.com/jomerbiason.png"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Jomer Biason | Portfolio"/>
+<meta name="twitter:description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, Tech Support, Station Head."/>
+<meta name="twitter:image" content="https://github.com/jomerbiason.png"/>
+
+<!-- Structured data so search engines understand this is a CV/profile page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Jomer Antoniego Biason",
+  "jobTitle": "MIS Assistant / Tech Support / Station Head",
+  "url": "https://jomerbiason.github.io/curriculum-vitae/",
+  "image": "https://github.com/jomerbiason.png",
+  "email": "mailto:jomerbiason@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "Cavite / Metro Manila",
+    "addressCountry": "PH"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/in/jomer-biason-6731b3245/"
+  ],
+  "alumniOf": {
+    "@type": "CollegeOrUniversity",
+    "name": "Cavite State University"
+  }
+}
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
@@ -379,6 +419,17 @@ footer a { color: var(--link); }
   .chest-grid { grid-template-columns: 1fr; }
   .cert-grid { grid-template-columns: 1fr; }
 }
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ground-stripe { animation: none; }
+  #fog-overlay { animation: none; }
+  .hero-text .open-badge { animation: none; }
+  .panel-title::before { animation: none; }
+  .panel { animation: none; opacity: 1; transform: none; }
+  #sky-scene, #wind-canvas, #world-canvas { display: none; }
+}
 </style>
 </head>
 <body>
@@ -387,7 +438,6 @@ footer a { color: var(--link); }
 <div id="sky-scene">
   <canvas id="cloud-canvas"></canvas>
   <div class="cloud-layer"></div>
-  <div class="celestial"></div>
   <div class="stars">
     <canvas id="stars-canvas"></canvas>
   </div>
@@ -534,12 +584,6 @@ footer a { color: var(--link); }
           <div class="chest-desc">Polished browser Minesweeper with difficulty levels, millisecond timer, and touch controls.</div>
           <a href="https://jomerbiason.github.io/minesweeper-classic/" target="_blank" class="chest-link">▶ PLAY GAME</a>
         </div>
-        <div class="chest">
-          <div class="chest-icon">🌐</div>
-          <div class="chest-name">CURRICULUM VITAE</div>
-          <div class="chest-desc">This portfolio site — responsive, animated, with dark mode and downloadable CV.</div>
-          <a href="https://jomerbiason.github.io/curriculum-vitae/" target="_blank" class="chest-link">▶ VISIT SITE</a>
-        </div>
       </div>
     </div>
   </section>
@@ -597,17 +641,17 @@ footer a { color: var(--link); }
           <div class="quest">
             <div class="quest-title">LIEZEL PENTECOSTES</div>
             <div class="quest-org">Loans Operation Manager</div>
-            <div class="quest-desc">liezel.pentecostes@easycash.ph</div>
+            <div class="quest-desc ref-email" data-user="liezel.pentecostes" data-domain="easycash.ph">Click to reveal email</div>
           </div>
           <div class="quest">
             <div class="quest-title">NOMER PEREZ</div>
             <div class="quest-org">MIS Specialist</div>
-            <div class="quest-desc">nomer.perez@easycash.ph</div>
+            <div class="quest-desc ref-email" data-user="nomer.perez" data-domain="easycash.ph">Click to reveal email</div>
           </div>
           <div class="quest">
             <div class="quest-title">MARY CHRISTINE JOY ROMAO</div>
             <div class="quest-org">HR Specialist</div>
-            <div class="quest-desc">joy.romao@easycash.ph</div>
+            <div class="quest-desc ref-email" data-user="joy.romao" data-domain="easycash.ph">Click to reveal email</div>
           </div>
         </div>
       </details>
@@ -641,9 +685,58 @@ footer a { color: var(--link); }
 
 <script>
 /* ══════════════════════════════════════════════
+   PREFERS-REDUCED-MOTION DETECTOR (used by all loops below)
+══════════════════════════════════════════════ */
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ══════════════════════════════════════════════
+   SHARED RESIZE DEBOUNCE HELPER
+══════════════════════════════════════════════ */
+function debounce(fn, wait){
+  let t;
+  return function(...args){
+    clearTimeout(t);
+    t = setTimeout(()=>fn.apply(this,args), wait);
+  };
+}
+
+/* ══════════════════════════════════════════════
+   REFERENCE EMAIL OBFUSCATION
+   Builds mailto links from data attributes on click/keyboard
+   instead of printing plain-text addresses into the DOM,
+   to deter scrapers from harvesting reference contacts.
+══════════════════════════════════════════════ */
+(function(){
+  document.querySelectorAll('.ref-email').forEach(el => {
+    el.style.cursor = 'pointer';
+    el.style.textDecoration = 'underline dotted';
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    function reveal(){
+      const user = el.getAttribute('data-user');
+      const domain = el.getAttribute('data-domain');
+      if(!user || !domain) return;
+      const address = user + '@' + domain;
+      el.textContent = address;
+      const link = document.createElement('a');
+      link.href = 'mailto:' + address;
+      link.style.color = 'var(--link)';
+      link.textContent = address;
+      el.textContent = '';
+      el.appendChild(link);
+      el.removeAttribute('tabindex');
+      el.style.cursor = 'default';
+    }
+    el.addEventListener('click', reveal);
+    el.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); reveal(); } });
+  });
+})();
+
+/* ══════════════════════════════════════════════
    STARS
 ══════════════════════════════════════════════ */
 (function(){
+  if(prefersReducedMotion) return;
   const canvas = document.getElementById('stars-canvas');
   const ctx = canvas.getContext('2d');
   let stars = [];
@@ -658,7 +751,7 @@ footer a { color: var(--link); }
     requestAnimationFrame(drawStars);
   }
   resize(); initStars();
-  window.addEventListener('resize',()=>{ resize(); initStars(); });
+  window.addEventListener('resize', debounce(()=>{ resize(); initStars(); }, 150));
   requestAnimationFrame(drawStars);
 })();
 
@@ -666,6 +759,7 @@ footer a { color: var(--link); }
    SUN / MOON + PIXEL CLOUDS — clouds drift right→left and pass in front of the sun/moon
 ══════════════════════════════════════════════ */
 (function(){
+  if(prefersReducedMotion) return;
   const canvas = document.getElementById('cloud-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, clouds = [];
@@ -965,7 +1059,7 @@ footer a { color: var(--link); }
   }
 
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', debounce(resize, 150));
   requestAnimationFrame(loop);
 })();
 
@@ -998,6 +1092,7 @@ footer a { color: var(--link); }
    PANEL STAGGER
 ══════════════════════════════════════════════ */
 (function(){
+  if(prefersReducedMotion) return;
   const panels = document.querySelectorAll('.panel');
   const obs = new IntersectionObserver(entries=>{
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.style.animationDelay='0s'; e.target.style.animationPlayState='running'; obs.unobserve(e.target); } });
@@ -1009,6 +1104,7 @@ footer a { color: var(--link); }
    WIND / MIST EFFECT
 ══════════════════════════════════════════════ */
 (function(){
+  if(prefersReducedMotion) return;
   const canvas = document.getElementById('wind-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, particles = [];
@@ -1062,7 +1158,7 @@ footer a { color: var(--link); }
   }
 
   resize(); initParticles();
-  window.addEventListener('resize', ()=>{ resize(); initParticles(); });
+  window.addEventListener('resize', debounce(()=>{ resize(); initParticles(); }, 150));
   requestAnimationFrame(drawParticles);
 })();
 
@@ -1070,6 +1166,7 @@ footer a { color: var(--link); }
    LIVING WORLD — TREES · BIRDS · BATS
 ══════════════════════════════════════════════ */
 (function(){
+  if(prefersReducedMotion) return;
   const canvas = document.getElementById('world-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, tick = 0;
@@ -1802,7 +1899,7 @@ footer a { color: var(--link); }
   initButterflies();
   initWisps();
   placeLamps();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', debounce(resize, 150));
   requestAnimationFrame(loop);
 })();
 </script>
