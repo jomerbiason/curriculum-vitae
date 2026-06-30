@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, IT Support, Web Developer.">
+<meta name="description" content="Jomer Antoniego Biason — MIS Assistant, Tech Support, Station Head.">
 <title>Jomer Biason | Portfolio</title>
 <link rel="icon" href="https://github.com/jomerbiason.png"/>
 <style>
@@ -77,19 +77,7 @@ body {
   overflow: hidden;
 }
 
-.celestial {
-  position: absolute;
-  width: 52px; height: 52px;
-  border-radius: 50%;
-  background: var(--cel);
-  top: 40px; right: 80px;
-  box-shadow: 0 0 0 6px rgba(255,255,200,0.2), 0 0 0 12px rgba(255,255,200,0.1);
-  transition: background 1.2s, box-shadow 1.2s;
-  image-rendering: pixelated;
-}
-[data-theme="night"] .celestial {
-  box-shadow: 0 0 0 6px rgba(200,220,255,0.15), 0 0 0 18px rgba(200,220,255,0.07);
-}
+.celestial { display: none; }
 
 .stars {
   position: absolute;
@@ -99,33 +87,43 @@ body {
 }
 [data-theme="night"] .stars { opacity: 1; }
 
-.cloud-layer {
+.cloud-layer { display: none; } /* replaced by #cloud-canvas pixel clouds below */
+
+#cloud-canvas {
   position: absolute;
-  top: 0; left: 0;
-  width: 200%; height: 100%;
-  background-image:
-    radial-gradient(ellipse 60px 20px at 150px 80px, rgba(255,255,255,0.85) 100%, transparent 100%),
-    radial-gradient(ellipse 40px 14px at 130px 80px, rgba(255,255,255,0.85) 100%, transparent 100%),
-    radial-gradient(ellipse 40px 14px at 178px 80px, rgba(255,255,255,0.85) 100%, transparent 100%),
-    radial-gradient(ellipse 70px 22px at 480px 60px, rgba(255,255,255,0.7) 100%, transparent 100%),
-    radial-gradient(ellipse 50px 16px at 455px 60px, rgba(255,255,255,0.7) 100%, transparent 100%),
-    radial-gradient(ellipse 50px 16px at 512px 60px, rgba(255,255,255,0.7) 100%, transparent 100%),
-    radial-gradient(ellipse 55px 18px at 820px 90px, rgba(255,255,255,0.75) 100%, transparent 100%),
-    radial-gradient(ellipse 38px 13px at 800px 90px, rgba(255,255,255,0.75) 100%, transparent 100%),
-    radial-gradient(ellipse 38px 13px at 846px 90px, rgba(255,255,255,0.75) 100%, transparent 100%);
-  background-repeat: repeat-x;
-  background-size: 1000px 200px;
-  animation: floatClouds 90s linear infinite;
-  transition: opacity 1s;
-}
-[data-theme="night"] .cloud-layer { opacity: 0.08; }
-
-@keyframes floatClouds {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  inset: 0;
+  width: 100%; height: 100%;
+  image-rendering: pixelated;
 }
 
-/* ── WIND / MIST CANVAS (mid-right to mid-left) ── */
+/* ── FOG / DEPTH OVERLAY ── */
+#fog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 78%, color-mix(in srgb, var(--sky) 55%, #fff 45%) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 75% 82%, color-mix(in srgb, var(--sky) 55%, #fff 45%) 0%, transparent 70%),
+    linear-gradient(to top, color-mix(in srgb, var(--sky) 35%, transparent) 0%, transparent 38%);
+  opacity: 0.5;
+  filter: blur(2px);
+  transition: opacity 0.8s, background 1.2s;
+  animation: fogDrift 26s ease-in-out infinite alternate;
+}
+[data-theme="night"] #fog-overlay {
+  background:
+    radial-gradient(ellipse 65% 42% at 25% 80%, color-mix(in srgb, var(--night-sky) 30%, #6b3fa0 25%) 0%, transparent 72%),
+    radial-gradient(ellipse 55% 38% at 78% 84%, color-mix(in srgb, var(--night-sky) 30%, #2d1a4e 25%) 0%, transparent 72%),
+    linear-gradient(to top, color-mix(in srgb, #000 50%, var(--night-sky) 50%) 0%, transparent 42%);
+  opacity: 0.62;
+}
+@keyframes fogDrift {
+  from { transform: translateX(-2%) scaleX(1.02); }
+  to   { transform: translateX(2%) scaleX(1.02); }
+}
+
+/* ── WIND / MIST CANVAS ── */
 #wind-canvas {
   position: fixed;
   top: 0; left: 0;
@@ -134,12 +132,29 @@ body {
   pointer-events: none;
 }
 
+/* ── WORLD CANVAS (trees, birds, bats, butterflies) ── */
+#world-canvas {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  image-rendering: pixelated;
+  filter: blur(1.1px) saturate(0.92);
+  opacity: 0.78;
+  transition: opacity 0.8s, filter 0.8s;
+}
+[data-theme="night"] #world-canvas {
+  filter: blur(1.6px) saturate(0.75) brightness(0.9);
+  opacity: 0.7;
+}
+
 /* ── GROUND ── */
 .ground-stripe {
   position: fixed;
   bottom: 0; left: 0;
   width: 100%; height: 48px;
-  z-index: 4;
+  z-index: 1;
   pointer-events: none;
   background:
     repeating-linear-gradient(90deg,
@@ -157,82 +172,17 @@ body {
   width: 100%; height: 8px;
   background: color-mix(in srgb, var(--ground) 110%, #fff 20%);
 }
-
-/* ── GAME CANVAS LAYER ── */
-#game-canvas {
-  position: fixed;
-  bottom: 0; left: 0;
-  width: 100%; height: 160px;
-  z-index: 5;
-  pointer-events: none;
-  image-rendering: pixelated;
-}
-
-/* ── CLICK RIPPLE ZONE ── */
-#bg-click-zone {
-  display: none;
-}
-
-/* ── GAME UI ── */
-#game-ui {
-  position: fixed;
-  bottom: 52px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: #fff;
-  text-shadow: 1px 1px 0 #000;
-  display: none;
-  gap: 12px;
-  background: rgba(0,0,0,0.55);
-  border: 2px solid #FFD700;
-  padding: 4px 12px;
+.ground-stripe::after {
+  content:'';
+  position: absolute;
+  inset: -40px 0 0 0;
+  background: radial-gradient(ellipse 70% 100% at 50% 100%, color-mix(in srgb, var(--ground) 20%, #000 30%) 0%, transparent 75%);
+  opacity: 0.45;
   pointer-events: none;
 }
-#game-ui.active { display: flex; }
-#game-ui span { color: #FFD700; }
-
-/* ── GAME PROMPT ── */
-#game-prompt {
-  position: fixed;
-  bottom: 62px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: #fff;
-  text-shadow: 1px 1px 0 #000, 0 0 10px #FFD700;
-  background: rgba(0,0,0,0.72);
-  border: 2px solid #FFD700;
-  box-shadow: 0 0 12px #FFD700, inset 0 0 8px rgba(255,215,0,0.15);
-  padding: 8px 16px;
-  animation: promptPulse 1.4s ease-in-out infinite;
-  pointer-events: all;
-  cursor: pointer;
-  white-space: nowrap;
-  user-select: none;
-}
-#game-prompt:hover {
-  background: rgba(30,20,0,0.92);
-  box-shadow: 0 0 22px #FFD700, inset 0 0 12px rgba(255,215,0,0.25);
-}
-@keyframes promptPulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 12px #FFD700, inset 0 0 8px rgba(255,215,0,0.15); }
-  50%       { opacity: 0.7; box-shadow: 0 0 4px #FFD700, inset 0 0 4px rgba(255,215,0,0.05); }
-}
-
-/* ── ATTACK FLASH ── */
-#attack-flash {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  background: rgba(255,200,0,0.18);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.08s;
+[data-theme="night"] .ground-stripe::after {
+  background: radial-gradient(ellipse 80% 100% at 50% 100%, rgba(60,20,90,0.45) 0%, transparent 75%);
+  opacity: 0.7;
 }
 
 /* ── HEADER ── */
@@ -407,18 +357,13 @@ footer a { color: var(--link); }
   .chest-grid { grid-template-columns: 1fr; }
   .cert-grid { grid-template-columns: 1fr; }
 }
-
-/* ── KILL FLASH EFFECT ── */
-@keyframes killFlash {
-  0% { opacity: 0.7; }
-  100% { opacity: 0; }
-}
 </style>
 </head>
 <body>
 
 <!-- SKY SCENE -->
 <div id="sky-scene">
+  <canvas id="cloud-canvas"></canvas>
   <div class="cloud-layer"></div>
   <div class="celestial"></div>
   <div class="stars">
@@ -426,28 +371,17 @@ footer a { color: var(--link); }
   </div>
 </div>
 
+<!-- FOG / DEPTH OVERLAY -->
+<div id="fog-overlay"></div>
+
 <!-- WIND / MIST -->
 <canvas id="wind-canvas"></canvas>
 
-<!-- BG CLICK ZONE -->
-<div id="bg-click-zone" aria-label="Click to trigger adventure"></div>
-
-<!-- GAME CANVAS -->
-<canvas id="game-canvas"></canvas>
+<!-- WORLD (trees, birds, bats, butterflies) -->
+<canvas id="world-canvas"></canvas>
 
 <!-- GROUND -->
 <div class="ground-stripe"></div>
-
-<!-- GAME UI -->
-<div id="game-ui">
-  ❤️ <span id="hp-display">3</span> &nbsp;|&nbsp; ⚔️ KILLS: <span id="kill-display">0</span> &nbsp;|&nbsp; 🏆 BEST: <span id="best-display">0</span>
-</div>
-
-<!-- GAME PROMPT -->
-<button id="game-prompt" aria-label="Start the minigame">▶ CLICK HERE TO BEGIN THE ADVENTURE ◀</button>
-
-<!-- ATTACK FLASH -->
-<div id="attack-flash"></div>
 
 <!-- HEADER -->
 <header>
@@ -469,8 +403,8 @@ footer a { color: var(--link); }
   <section class="hero">
     <div class="hero-avatar" aria-hidden="true">⚔️</div>
     <div class="hero-text">
-      <h1>JOMER<br>BIASON</h1>
-      <div class="subtitle">MIS Assistant · IT Support · Web Dev</div>
+      <h1>JOMER BIASON</h1>
+      <div class="subtitle">MIS Assistant · Tech Support · Station Head</div>
       <div class="subtitle" style="font-size:15px; opacity:0.7;">📍 Cavite / Metro Manila, PH</div>
       <div class="open-badge">▶ OPEN TO WORK</div>
     </div>
@@ -480,7 +414,7 @@ footer a { color: var(--link); }
     <div class="panel">
       <div class="panel-title">CAREER QUEST</div>
       <div class="dialogue">
-        <div class="dialogue-name">JOMER SAYS:</div>
+        <div class="dialogue-name">ABOUT ME:</div>
         I'm a tech enthusiast with a background in MIS and IT support.
         I love simplifying complex tasks and finding efficient solutions.
         Currently seeking a fast-paced role where I can be a helpful team player,
@@ -577,12 +511,6 @@ footer a { color: var(--link); }
           <div class="chest-name">MINESWEEPER CLASSIC</div>
           <div class="chest-desc">Polished browser Minesweeper with difficulty levels, millisecond timer, and touch controls.</div>
           <a href="https://jomerbiason.github.io/minesweeper-classic/" target="_blank" class="chest-link">▶ PLAY GAME</a>
-        </div>
-        <div class="chest">
-          <div class="chest-icon">🌐</div>
-          <div class="chest-name">CURRICULUM VITAE</div>
-          <div class="chest-desc">This portfolio site — responsive, animated, with dark mode and downloadable CV.</div>
-          <a href="https://jomerbiason.github.io/curriculum-vitae/" target="_blank" class="chest-link">▶ VISIT SITE</a>
         </div>
       </div>
     </div>
@@ -681,7 +609,6 @@ footer a { color: var(--link); }
 
 <footer>
   <div>© 2026 JOMER ANTONIEGO BIASON · ALL RIGHTS RESERVED</div>
-  <div style="margin-top:6px; opacity:0.6;">PRESS START TO HIRE ▶</div>
 </footer>
 
 <script>
@@ -708,8 +635,153 @@ footer a { color: var(--link); }
 })();
 
 /* ══════════════════════════════════════════════
-   THEME
+   SUN / MOON + PIXEL CLOUDS — clouds drift right→left and pass in front of the sun/moon
 ══════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('cloud-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, clouds = [];
+  const CS = 6; // cloud pixel block size
+
+  // Cloud "blueprints": grid of 1/0 cells forming a pixel cloud silhouette
+  const SHAPES = [
+    [[0,0,1,1,0,0],[0,1,1,1,1,0],[1,1,1,1,1,1],[1,1,1,1,1,1]],
+    [[0,1,1,0,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0]],
+    [[0,0,1,1,1,0,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0]],
+    [[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]],
+  ];
+
+  function isNight(){ return document.documentElement.getAttribute('data-theme') === 'night'; }
+
+  // Celestial body position (matches old .celestial spot: top:40px, right:80px, 52px wide)
+  function celestialPos(){
+    const r = 28; // radius in CSS px
+    return { x: W - 80 - r, y: 40 + r, r };
+  }
+
+  function drawCelestial(night){
+    const { x, y, r } = celestialPos();
+    ctx.save();
+    if(!night){
+      // glow halo
+      const halo = ctx.createRadialGradient(x,y,r*0.6,x,y,r*2.4);
+      halo.addColorStop(0, 'rgba(255,255,200,0.28)');
+      halo.addColorStop(1, 'rgba(255,255,200,0)');
+      ctx.beginPath(); ctx.arc(x,y,r*2.4,0,Math.PI*2); ctx.fillStyle = halo; ctx.fill();
+      // pixel sun body
+      ctx.fillStyle = '#FFD700';
+      const ps = Math.max(2, Math.round(r/9));
+      for(let dy=-r; dy<=r; dy+=ps){
+        for(let dx=-r; dx<=r; dx+=ps){
+          if(dx*dx+dy*dy <= r*r) ctx.fillRect(x+dx, y+dy, ps, ps);
+        }
+      }
+      // simple ray pixels
+      ctx.fillStyle = 'rgba(255,215,0,0.55)';
+      [[-1,-1],[1,-1],[-1,1],[1,1],[0,-1],[0,1],[-1,0],[1,0]].forEach(([mx,my])=>{
+        ctx.fillRect(x+mx*(r+ps*2), y+my*(r+ps*2), ps*2, ps*2);
+      });
+    } else {
+      // night halo (cool, dim)
+      const halo = ctx.createRadialGradient(x,y,r*0.6,x,y,r*2.2);
+      halo.addColorStop(0, 'rgba(200,220,255,0.18)');
+      halo.addColorStop(1, 'rgba(200,220,255,0)');
+      ctx.beginPath(); ctx.arc(x,y,r*2.2,0,Math.PI*2); ctx.fillStyle = halo; ctx.fill();
+      // pixel moon body
+      ctx.fillStyle = '#ddeeff';
+      const ps = Math.max(2, Math.round(r/9));
+      for(let dy=-r; dy<=r; dy+=ps){
+        for(let dx=-r; dx<=r; dx+=ps){
+          if(dx*dx+dy*dy <= r*r) ctx.fillRect(x+dx, y+dy, ps, ps);
+        }
+      }
+      // craters
+      ctx.fillStyle = 'rgba(170,190,210,0.7)';
+      ctx.fillRect(x-r*0.35, y-r*0.2, ps*2.4, ps*2.4);
+      ctx.fillRect(x+r*0.15, y+r*0.25, ps*1.8, ps*1.8);
+      ctx.fillRect(x+r*0.3, y-r*0.4, ps*1.4, ps*1.4);
+    }
+    ctx.restore();
+  }
+
+  function resize(){
+    W = canvas.width = canvas.parentElement.clientWidth || window.innerWidth;
+    H = canvas.height = canvas.parentElement.clientHeight || window.innerHeight;
+    initClouds();
+  }
+
+  function initClouds(){
+    clouds = [];
+    const cel = celestialPos();
+    const count = Math.max(6, Math.floor(W / 220));
+    for(let i=0;i<count;i++){
+      // bias roughly a third of clouds toward the sun/moon's vertical band so they pass in front of it
+      const throughSun = i % 3 === 0;
+      clouds.push({
+        x: Math.random() * (W + 300) - 150,
+        y: throughSun ? cel.y + (Math.random()-0.5) * cel.r * 1.6 : H * (0.04 + Math.random() * 0.4),
+        shape: SHAPES[Math.floor(Math.random()*SHAPES.length)],
+        scale: throughSun ? 1.2 + Math.random()*1.4 : 0.8 + Math.random() * 1.3,
+        speed: 0.05 + Math.random() * 0.16,
+        depth: Math.random(), // affects opacity/size for parallax
+      });
+    }
+  }
+
+  function drawCloud(c, night){
+    const ps = CS * c.scale;
+    const rows = c.shape.length, cols = c.shape[0].length;
+    const totalW = cols * ps;
+    const baseAlpha = 0.35 + c.depth * 0.55;
+
+    ctx.save();
+    ctx.translate(c.x - totalW/2, c.y);
+
+    for(let r=0;r<rows;r++){
+      for(let col=0; col<cols; col++){
+        if(!c.shape[r][col]) continue;
+        let fill;
+        if(!night){
+          // Day: soft white/cream with light blue shadow underside
+          fill = r < rows-1
+            ? `rgba(255,255,250,${baseAlpha})`
+            : `rgba(210,222,235,${baseAlpha*0.85})`;
+        } else {
+          // Night: dim slate/purple, thin and moody, faint moonlit rim
+          fill = r === 0
+            ? `rgba(120,130,160,${baseAlpha*0.55})`
+            : `rgba(45,40,70,${baseAlpha*0.6})`;
+        }
+        ctx.fillStyle = fill;
+        ctx.fillRect(col*ps, r*ps, ps+0.5, ps+0.5);
+      }
+    }
+    ctx.restore();
+  }
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    const night = isNight();
+
+    // sun/moon drawn first, clouds drawn on top so they visually pass in front of it
+    drawCelestial(night);
+
+    clouds.forEach(c => {
+      // right → left drift
+      c.x -= c.speed * (0.4 + c.depth) * 1.6;
+      if(c.x + 200 < -150) c.x = W + 150 + Math.random()*120;
+      drawCloud(c, night);
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(loop);
+})();
+
+
 (function(){
   const btn = document.getElementById('theme-btn');
   const body = document.documentElement;
@@ -746,20 +818,16 @@ footer a { color: var(--link); }
 })();
 
 /* ══════════════════════════════════════════════
-   WIND / MIST EFFECT (mid-right → mid-left)
+   WIND / MIST EFFECT
 ══════════════════════════════════════════════ */
 (function(){
   const canvas = document.getElementById('wind-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, particles = [];
 
-  function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 
   function spawnParticle(){
-    // Spawn in the middle-right area
     const yCenter = H * 0.42;
     const ySpread = H * 0.22;
     return {
@@ -771,7 +839,6 @@ footer a { color: var(--link); }
       decay: 0.003 + Math.random() * 0.004,
       size: 60 + Math.random() * 140,
       alpha: 0.03 + Math.random() * 0.07,
-      hue: Math.random() > 0.5 ? 'rgba(255,255,255,' : 'rgba(180,220,255,'
     };
   }
 
@@ -779,7 +846,7 @@ footer a { color: var(--link); }
     particles = [];
     for(let i=0;i<30;i++){
       const p = spawnParticle();
-      p.x = Math.random() * W * 1.5; // pre-scatter across screen initially
+      p.x = Math.random() * W * 1.5;
       p.life = Math.random();
       particles.push(p);
     }
@@ -788,7 +855,6 @@ footer a { color: var(--link); }
   function drawParticles(){
     ctx.clearRect(0,0,W,H);
     const isNight = document.documentElement.getAttribute('data-theme') === 'night';
-
     particles.forEach(p => {
       const a = p.alpha * p.life;
       const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
@@ -800,673 +866,461 @@ footer a { color: var(--link); }
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fillStyle = grad;
       ctx.fill();
-
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= p.decay;
+      p.x += p.vx; p.y += p.vy; p.life -= p.decay;
     });
-
-    // Remove dead, spawn new
     particles = particles.filter(p => p.life > 0);
     while(particles.length < 30) particles.push(spawnParticle());
-
     requestAnimationFrame(drawParticles);
   }
 
-  resize();
-  initParticles();
+  resize(); initParticles();
   window.addEventListener('resize', ()=>{ resize(); initParticles(); });
   requestAnimationFrame(drawParticles);
 })();
 
 /* ══════════════════════════════════════════════
-   SPRITE PIXEL ART DEFINITIONS
-   All drawn programmatically on canvas — no external images needed
-══════════════════════════════════════════════ */
-const SPRITES = {
-  // ── CHAMPION ──
-  // Each frame is a 16×16 pixel grid (0=transparent, color codes below)
-  // Colors: 1=skin, 2=hair/darkbrown, 3=gold(shield/sword), 4=green(tunic), 5=darkgreen, 6=brown(belt), 7=red, 8=silver, 9=white, A=darkbrown
-  champion: {
-    palette: {
-      1: '#FDBCB4', 2: '#5C3317', 3: '#FFD700', 4: '#3a7d44', 5: '#2d6a4f',
-      6: '#7B4C00', 7: '#CC2222', 8: '#C0C0C0', 9: '#FFFFFF', A: '#3d2b1f',
-      B: '#111111', C: '#88aaff', D: '#6688ff'
-    },
-    // IDLE frame (training at dummy)
-    idle: [
-      [0,0,0,0,0,2,2,2,2,0,0,0,0,0,0,0],
-      [0,0,0,0,2,1,1,1,1,2,0,0,0,0,0,0],
-      [0,0,0,0,2,1,1,1,1,2,0,0,0,0,0,0],
-      [0,0,0,0,0,2,1,1,2,0,0,0,0,0,0,0],
-      [0,0,0,3,4,4,4,4,4,4,0,0,0,0,0,0],
-      [0,0,3,3,4,4,4,4,4,4,4,0,0,0,0,0],
-      [0,3,3,3,4,6,6,6,6,4,4,0,0,0,0,0],
-      [0,3,3,3,5,5,5,5,5,5,4,0,0,0,0,0],
-      [0,0,3,3,5,5,5,5,5,5,4,0,0,8,8,0],
-      [0,0,0,0,4,4,4,4,4,4,0,0,0,8,0,0],
-      [0,0,0,0,5,5,0,0,5,5,0,0,0,8,0,0],
-      [0,0,0,0,5,5,0,0,5,5,0,0,0,0,0,0],
-      [0,0,0,0,6,6,0,0,6,6,0,0,0,0,0,0],
-      [0,0,0,0,6,6,0,0,6,6,0,0,0,0,0,0],
-      [0,0,0,0,A,A,0,0,A,A,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-    // RUN frame 1
-    run1: [
-      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
-      [0,0,0,2,1,1,1,2,0,0,0,0,0,0,0,0],
-      [0,3,3,4,4,4,4,4,4,0,0,0,0,0,0,0],
-      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
-      [3,3,0,5,6,6,6,6,5,4,0,0,8,8,0,0],
-      [3,3,0,5,5,5,5,5,5,4,0,0,8,0,0,0],
-      [0,3,0,5,5,5,5,5,5,4,0,0,8,0,0,0],
-      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
-      [0,0,5,5,0,0,0,5,5,0,0,0,0,0,0,0],
-      [0,5,5,0,0,0,0,0,5,5,0,0,0,0,0,0],
-      [0,6,6,0,0,0,0,0,6,6,0,0,0,0,0,0],
-      [0,6,0,0,0,0,0,0,0,6,0,0,0,0,0,0],
-      [A,A,0,0,0,0,0,0,0,A,A,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-    // RUN frame 2
-    run2: [
-      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
-      [0,0,0,2,1,1,1,2,0,0,0,0,0,0,0,0],
-      [0,3,3,4,4,4,4,4,4,0,0,0,0,0,0,0],
-      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
-      [3,3,0,5,6,6,6,6,5,4,0,0,0,8,8,0],
-      [3,3,0,5,5,5,5,5,5,4,0,0,0,8,0,0],
-      [0,3,0,5,5,5,5,5,5,4,0,0,0,8,0,0],
-      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
-      [0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0],
-      [0,0,0,6,6,0,6,6,0,0,0,0,0,0,0,0],
-      [0,0,0,6,6,0,0,6,0,0,0,0,0,0,0,0],
-      [0,0,A,A,0,0,0,A,A,0,0,0,0,0,0,0],
-      [0,A,A,0,0,0,0,0,A,A,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-    // SLASH frame 1
-    slash1: [
-      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,3,3,3,3,0,0],
-      [0,0,0,2,1,1,1,2,0,3,0,0,0,3,0,0],
-      [0,3,3,4,4,4,4,4,4,3,3,0,0,0,0,0],
-      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
-      [3,3,0,5,6,6,6,6,5,4,0,8,8,8,8,0],
-      [3,3,0,5,5,5,5,5,5,4,0,0,0,0,8,0],
-      [0,3,0,5,5,5,5,5,5,4,0,0,0,0,8,0],
-      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
-      [0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0],
-      [0,5,5,0,0,0,0,5,5,0,0,0,0,0,0,0],
-      [0,6,6,0,0,0,0,6,6,0,0,0,0,0,0,0],
-      [0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0],
-      [A,A,0,0,0,0,0,0,A,A,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-    // SLASH frame 2 (impact)
-    slash2: [
-      [0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0],
-      [0,0,2,1,1,1,1,1,2,0,0,3,3,3,3,3],
-      [0,0,2,1,1,1,1,1,2,0,3,3,0,0,0,3],
-      [0,0,0,2,1,1,1,2,3,3,3,0,0,0,0,0],
-      [0,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
-      [3,3,3,4,4,4,4,4,4,4,0,0,0,0,0,0],
-      [3,3,0,5,6,6,6,6,5,4,0,0,8,8,8,8],
-      [3,3,0,5,5,5,5,5,5,4,0,0,0,0,0,8],
-      [0,3,0,5,5,5,5,5,5,4,0,0,0,0,0,8],
-      [0,0,0,4,4,4,4,4,4,0,0,0,0,0,0,0],
-      [0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0],
-      [0,5,5,0,0,0,0,5,5,0,0,0,0,0,0,0],
-      [0,6,6,0,0,0,0,6,6,0,0,0,0,0,0,0],
-      [0,6,0,0,0,0,0,0,6,0,0,0,0,0,0,0],
-      [A,A,0,0,0,0,0,0,A,A,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-  },
-
-  // ── DUMMY (training post) ──
-  dummy: {
-    palette: {
-      1: '#8B6914', 2: '#5C3317', 3: '#CC6622', 4: '#DDAA55',
-      5: '#FFCC44', 6: '#4a3010', 7: '#222', 8: '#CC2222'
-    },
-    frame: [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,8,8,8,8,0,0,0,0,0,0],
-      [0,0,0,0,0,8,3,3,3,3,8,0,0,0,0,0],
-      [0,0,0,0,0,8,3,3,3,3,8,0,0,0,0,0],
-      [0,0,0,0,0,8,3,3,3,3,8,0,0,0,0,0],
-      [0,0,0,0,0,8,8,8,8,8,8,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-      [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
-      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-      [0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0],
-      [0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ]
-  },
-
-  // ── SLIME ENEMY ──
-  slime: {
-    palette: {
-      1: '#44BB44', 2: '#22AA22', 3: '#66DD66', 4: '#003300',
-      5: '#FF4444', 6: '#FFFFFF', 7: '#226622'
-    },
-    frame1: [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
-      [0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0],
-      [0,0,0,1,3,3,3,3,3,3,3,3,1,0,0,0],
-      [0,0,0,1,3,6,4,3,3,6,4,3,1,0,0,0],
-      [0,0,0,1,3,6,4,3,3,6,4,3,1,0,0,0],
-      [0,0,0,1,2,2,2,5,5,2,2,2,1,0,0,0],
-      [0,0,1,1,2,2,2,2,2,2,2,2,1,1,0,0],
-      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
-      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
-      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
-      [0,0,1,7,2,2,2,2,2,2,2,2,7,1,0,0],
-      [0,0,0,1,7,7,2,2,2,2,7,7,1,0,0,0],
-      [0,0,0,0,1,1,1,7,7,1,1,1,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-    frame2: [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
-      [0,0,0,1,3,3,3,3,3,3,3,3,1,0,0,0],
-      [0,0,1,3,3,6,4,3,3,6,4,3,3,1,0,0],
-      [0,0,1,3,3,6,4,3,3,6,4,3,3,1,0,0],
-      [0,0,1,2,2,2,5,5,5,5,2,2,2,1,0,0],
-      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
-      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
-      [0,1,2,2,2,2,2,2,2,2,2,2,2,2,1,0],
-      [0,0,1,7,2,2,2,2,2,2,2,2,7,1,0,0],
-      [0,0,0,1,7,7,2,2,2,2,7,7,1,0,0,0],
-      [0,0,0,0,1,1,1,7,7,1,1,1,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ]
-  },
-
-  // ── SKELETON ENEMY ──
-  skeleton: {
-    palette: {
-      1: '#EEEECC', 2: '#AAAAAA', 3: '#CCCCAA', 4: '#555555',
-      5: '#FF3333', 6: '#888866', 7: '#FFFFFF', 8: '#333322'
-    },
-    frame1: [
-      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
-      [0,0,0,0,1,3,3,3,3,3,1,0,0,0,0,0],
-      [0,0,0,0,1,7,4,3,4,7,1,0,0,0,0,0],
-      [0,0,0,0,1,3,3,5,3,3,1,0,0,0,0,0],
-      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
-      [0,0,0,0,0,2,1,1,1,2,0,0,0,0,0,0],
-      [0,0,2,0,2,1,1,1,1,1,2,0,2,0,0,0],
-      [0,2,0,2,0,2,1,1,1,2,0,2,0,2,0,0],
-      [0,0,2,0,0,2,6,6,6,2,0,0,2,0,0,0],
-      [0,0,0,0,0,2,6,6,6,2,0,0,0,0,0,0],
-      [0,0,0,0,0,2,2,0,2,2,0,0,0,0,0,0],
-      [0,0,0,0,2,2,0,0,0,2,2,0,0,0,0,0],
-      [0,0,0,2,2,0,0,0,0,0,2,2,0,0,0,0],
-      [0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0],
-      [0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ],
-    frame2: [
-      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
-      [0,0,0,0,1,3,3,3,3,3,1,0,0,0,0,0],
-      [0,0,0,0,1,7,4,3,4,7,1,0,0,0,0,0],
-      [0,0,0,0,1,3,3,5,3,3,1,0,0,0,0,0],
-      [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
-      [0,0,0,0,0,2,1,1,1,2,0,0,0,0,0,0],
-      [0,2,0,0,2,1,1,1,1,1,2,0,0,2,0,0],
-      [0,0,2,0,0,2,1,1,1,2,0,0,2,0,0,0],
-      [0,0,0,2,0,2,6,6,6,2,0,2,0,0,0,0],
-      [0,0,0,0,0,2,6,6,6,2,0,0,0,0,0,0],
-      [0,0,0,0,0,2,2,0,2,2,0,0,0,0,0,0],
-      [0,0,0,2,2,2,0,0,0,2,2,2,0,0,0,0],
-      [0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0],
-      [0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0],
-      [0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ]
-  }
-};
-
-/* ══════════════════════════════════════════════
-   SPRITE RENDERER
-══════════════════════════════════════════════ */
-function renderSprite(ctx, grid, palette, x, y, scale, flipX) {
-  const rows = grid.length;
-  const cols = grid[0].length;
-  ctx.save();
-  if(flipX) {
-    ctx.translate(x + cols * scale, y);
-    ctx.scale(-1, 1);
-    ctx.translate(-x, -y);
-  }
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const v = grid[r][c];
-      if(v === 0) continue;
-      const key = v.toString(16).toUpperCase();
-      ctx.fillStyle = palette[key] || palette[v] || '#FF00FF';
-      ctx.fillRect(x + c*scale, y + r*scale, scale, scale);
-    }
-  }
-  ctx.restore();
-}
-
-/* ══════════════════════════════════════════════
-   EXPLOSION PARTICLES
-══════════════════════════════════════════════ */
-function createExplosion(x, y) {
-  const colors = ['#FFD700','#FF6600','#FF3333','#FFFFFF','#FFAA00'];
-  return Array.from({length: 12}, () => ({
-    x, y,
-    vx: (Math.random()-0.5)*6,
-    vy: -(Math.random()*5+1),
-    life: 1.0,
-    color: colors[Math.floor(Math.random()*colors.length)],
-    size: Math.floor(Math.random()*3+2)
-  }));
-}
-
-/* ══════════════════════════════════════════════
-   FLOATING TEXT
-══════════════════════════════════════════════ */
-function createFloatText(x, y, text, color) {
-  return { x, y, text, color, life: 1.0, vy: -1.5 };
-}
-
-/* ══════════════════════════════════════════════
-   MINIGAME ENGINE
+   LIVING WORLD — TREES · BIRDS · BATS
 ══════════════════════════════════════════════ */
 (function(){
-  const canvas = document.getElementById('game-canvas');
+  const canvas = document.getElementById('world-canvas');
   const ctx = canvas.getContext('2d');
-  const gameUI = document.getElementById('game-ui');
-  const gamePrompt = document.getElementById('game-prompt');
-  const hpDisplay = document.getElementById('hp-display');
-  const killDisplay = document.getElementById('kill-display');
-  const bestDisplay = document.getElementById('best-display');
-  const attackFlash = document.getElementById('attack-flash');
+  let W, H, tick = 0;
 
-  const SCALE = 3; // pixel scale factor
-  const SPR = 16;  // sprite size in pixels
-  const DRAW_SIZE = SPR * SCALE; // = 48px
+  // ── pixel scale: 1 unit = 3 CSS pixels ──
+  const S = 3;
 
-  let W, H;
-  let gameActive = false;
-  let kills = 0, bestKills = parseInt(localStorage.getItem('jomer-best')||'0');
-  let hp = 3;
-  let frameTimer = 0;
-  let animTick = 0;
-  let explosions = [];
-  let floatTexts = [];
-  let lastTime = 0;
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    placeTrees();
+    if(typeof initButterflies === 'function' && butterflies && butterflies.length) initButterflies();
+    if(typeof initWisps === 'function' && wisps && wisps.length) initWisps();
+  }
 
-  // Champion state
-  const champ = {
-    x: 0, y: 0,
-    state: 'idle', // idle | running | combat | slash | retreating | dead
-    frame: 0,
-    frameTimer: 0,
-    targetX: 0,
-    slowTimer: 0,
-    slashTimer: 0,
-    invincible: 0,
-    blinkTimer: 0,
-    flashTimer: 0
-  };
+  function isNight(){ return document.documentElement.getAttribute('data-theme') === 'night'; }
 
-  // Dummy state (shown before game starts)
-  const dummy = { x: 0, y: 0 };
+  /* ─────────────────── TREES ─────────────────── */
+  // Each tree: { x, groundY, swayPhase, swaySpeed, scale }
+  let trees = [];
 
-  // Enemies
-  let enemies = [];
-  let spawnTimer = 0;
-  let spawnInterval = 240; // frames between spawns
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = 160;
-    // Ground level: sprite feet sit just above ground stripe (48px)
-    const groundY = H - DRAW_SIZE - 52;
-    champ.y = groundY;
-    dummy.x = 110;
-    dummy.y = groundY;
-    if(!gameActive) {
-      // Champion stands left of dummy, facing it (facing right)
-      champ.x = dummy.x - DRAW_SIZE - 6;
-      champ.state = 'idle';
+  function placeTrees(){
+    // Ground top = bottom of screen - 48px (ground stripe)
+    const groundTop = H - 48;
+    // Spread trees across screen width, avoid center
+    const treeXPositions = [];
+    const count = Math.max(4, Math.floor(W / 220));
+    for(let i=0;i<count;i++){
+      treeXPositions.push( Math.round( (i + 0.5) * (W / count) ) );
     }
+    // Re-use existing phases if possible so trees don't reset on resize
+    trees = treeXPositions.map((x, i) => ({
+      x,
+      groundY: groundTop,
+      swayPhase: trees[i] ? trees[i].swayPhase : Math.random() * Math.PI * 2,
+      swaySpeed: 0.008 + Math.random() * 0.006,
+      scale: 0.85 + Math.random() * 0.35,
+    }));
   }
 
-  function startGame() {
-    if(gameActive) return;
-    gameActive = true;
-    hp = 3;
-    kills = 0;
-    enemies = [];
-    explosions = [];
-    floatTexts = [];
-    spawnTimer = 120;
-    spawnInterval = 240;
-    const groundY = H - DRAW_SIZE - 52;
-    champ.state = 'running';
-    champ.x = dummy.x;
-    champ.y = groundY;
-    champ.targetX = W * 0.45;
-    champ.invincible = 0;
-    champ.slowTimer = 0;
-    champ.slashTimer = 0;
-    champ.frame = 0;
-    gameUI.classList.add('active');
-    gamePrompt.style.display = 'none';
-    updateUI();
-  }
+  /* Draw one pixel-art tree.
+     Day:   lush green canopy, brown trunk
+     Night: bare spooky silhouette, purple-tinted, jagged branches */
+  function drawTree(x, groundY, swayAngle, sc, night){
+    ctx.save();
+    ctx.translate(x, groundY);
 
-  function endGame() {
-    gameActive = false;
-    if(kills > bestKills){ bestKills = kills; localStorage.setItem('jomer-best', bestKills); }
-    floatTexts.push(createFloatText(W/2, H*0.3, 'GAME OVER!', '#FF3333'));
-    floatTexts.push(createFloatText(W/2, H*0.3 + 24, `KILLS: ${kills}`, '#FFD700'));
-    setTimeout(()=>{
-      gameUI.classList.remove('active');
-      gamePrompt.style.display = '';
-      gamePrompt.textContent = `▶ DEFEATED! BEST: ${bestKills} · CLICK TO RETRY ◀`;
-      const groundY = H - DRAW_SIZE - 52;
-      champ.state = 'idle';
-      champ.x = dummy.x - DRAW_SIZE - 6;
-      champ.y = groundY;
-      enemies = [];
-    }, 2500);
-  }
+    if(!night){
+      /* ── DAY TREE ── */
+      // Trunk: 4px wide × 14px tall at scale S
+      const tw = 4*S*sc, th = 14*S*sc;
+      ctx.fillStyle = '#6B3A1F';
+      ctx.fillRect(-tw/2, -th, tw, th);
+      // dark stripe on trunk
+      ctx.fillStyle = '#4a2510';
+      ctx.fillRect(-tw/2+S*sc, -th, S*sc, th);
 
-  function updateUI() {
-    const hearts = '❤️'.repeat(hp) + '🖤'.repeat(Math.max(0,3-hp));
-    hpDisplay.textContent = hearts;
-    killDisplay.textContent = kills;
-    bestDisplay.textContent = bestKills;
-  }
+      // Sway pivot at canopy base
+      ctx.translate(0, -th);
+      ctx.rotate(swayAngle);
 
-  function spawnEnemy() {
-    const types = ['slime','skeleton'];
-    const type = types[Math.floor(Math.random()*types.length)];
-    const groundY = H - DRAW_SIZE - 52;
-    enemies.push({
-      type,
-      x: W + DRAW_SIZE,
-      y: groundY,
-      vx: -(1.2 + Math.random()*0.8 + kills*0.04),
-      frame: 0,
-      frameTimer: 0,
-      state: 'alive',
-      deathTimer: 0,
-      hp: type === 'skeleton' ? 2 : 1
-    });
-  }
-
-  function flashScreen(color) {
-    attackFlash.style.background = color || 'rgba(255,200,0,0.22)';
-    attackFlash.style.opacity = 1;
-    setTimeout(()=>{ attackFlash.style.opacity = 0; }, 120);
-  }
-
-  function update(dt) {
-    if(!gameActive) return;
-
-    animTick++;
-    spawnTimer--;
-    if(spawnTimer <= 0) {
-      spawnEnemy();
-      spawnTimer = Math.max(80, spawnInterval - kills * 3);
-    }
-
-    // ── CHAMPION LOGIC ──
-    if(champ.state !== 'dead') {
-      champ.frameTimer++;
-
-      // Slow drift: sometimes champion drifts backward
-      if(champ.slowTimer > 0) {
-        champ.slowTimer--;
-        champ.x -= 0.25;
-        champ.x = Math.max(20, champ.x);
-      }
-
-      // Running toward target
-      if(champ.state === 'running' || champ.state === 'retreating') {
-        const speed = champ.state === 'retreating' ? 0.5 : 1.8;
-        const dx = champ.targetX - champ.x;
-        if(Math.abs(dx) > 2) {
-          champ.x += Math.sign(dx) * speed;
-        } else {
-          champ.state = 'combat';
-          champ.frame = 0;
-          // Randomly trigger slow retreat
-          if(Math.random() < 0.3) {
-            champ.slowTimer = 60 + Math.floor(Math.random()*80);
+      // Canopy: three layered circles (pixel-art style using rects)
+      const drawPixelCircle = (cx, cy, r, col) => {
+        ctx.fillStyle = col;
+        // approximate circle with squares at pixel grid
+        const ps = S * sc;
+        for(let dy=-r;dy<=r;dy++){
+          for(let dx=-r;dx<=r;dx++){
+            if(dx*dx + dy*dy <= r*r + r*0.5){
+              ctx.fillRect(cx+dx*ps - ps/2, cy+dy*ps - ps/2, ps, ps);
+            }
           }
         }
-      }
+      };
+      // Shadow layer
+      drawPixelCircle(0, 0, 5, '#1a5c2a');
+      // Mid layer
+      drawPixelCircle(-1*S*sc, -1*S*sc, 4, '#2d8a3e');
+      // Highlight
+      drawPixelCircle(-2*S*sc, -2*S*sc, 3, '#3aaa50');
+      // Tiny bright highlight
+      drawPixelCircle(-3*S*sc, -3*S*sc, 1, '#5acc66');
 
-      // Slash timer
-      if(champ.slashTimer > 0) {
-        champ.slashTimer--;
-        if(champ.slashTimer === 0 && champ.state === 'slash') {
-          champ.state = 'combat';
+    } else {
+      /* ── NIGHT SPOOKY TREE ── */
+      // Silhouette color: near-black with slight purple tint
+      const col = '#1a0d2e';
+      const colAlt = '#2a1040';
+
+      const tw = 3*S*sc, th = 18*S*sc;
+      ctx.fillStyle = col;
+      ctx.fillRect(-tw/2, -th, tw, th);
+
+      // Sway
+      ctx.translate(0, -th);
+      ctx.rotate(swayAngle * 0.6);
+
+      // Bare jagged branches — left and right
+      const drawBranch = (angle, length, branchColor) => {
+        ctx.save();
+        ctx.rotate(angle);
+        ctx.fillStyle = branchColor;
+        for(let i=0;i<length;i++){
+          ctx.fillRect(i*S*sc - S*sc*0.5, -S*sc*0.5, S*sc, S*sc);
         }
-      }
+        // tiny fork at end
+        ctx.save();
+        ctx.translate(length*S*sc, 0);
+        ctx.rotate(-0.5);
+        for(let i=0;i<2;i++) ctx.fillRect(i*S*sc, -S*sc*0.5, S*sc, S*sc);
+        ctx.restore();
+        ctx.save();
+        ctx.translate(length*S*sc, 0);
+        ctx.rotate(0.5);
+        for(let i=0;i<2;i++) ctx.fillRect(i*S*sc, -S*sc*0.5, S*sc, S*sc);
+        ctx.restore();
+        ctx.restore();
+      };
 
-      // Invincibility frames
-      if(champ.invincible > 0) champ.invincible--;
-    }
+      // Main branches
+      drawBranch(-0.65, 5, col);
+      drawBranch(0.65, 5, col);
+      drawBranch(-1.1, 3, colAlt);
+      drawBranch(1.1, 3, colAlt);
+      drawBranch(-0.3, 4, col);
+      drawBranch(0.3, 4, col);
 
-    // ── ENEMY LOGIC ──
-    for(let i = enemies.length-1; i>=0; i--) {
-      const e = enemies[i];
-      if(e.state === 'dead') {
-        e.deathTimer--;
-        if(e.deathTimer <= 0) enemies.splice(i, 1);
-        continue;
-      }
+      // Top gnarled tip
+      ctx.fillStyle = col;
+      ctx.fillRect(-S*sc, -2*S*sc, S*sc, 2*S*sc);
+      ctx.fillRect(0, -3*S*sc, S*sc, 3*S*sc);
 
-      e.frameTimer++;
-      e.x += e.vx;
-
-      // Enemy reaches champion
-      if(e.x <= champ.x + DRAW_SIZE * 0.8 && champ.state !== 'dead') {
-        // Champion slashes!
-        if(champ.state === 'combat' || champ.state === 'slash') {
-          champ.state = 'slash';
-          champ.slashTimer = 20;
-          champ.frame = 0;
-          e.hp--;
-          if(e.hp <= 0) {
-            e.state = 'dead';
-            e.deathTimer = 30;
-            explosions.push(...createExplosion(e.x + DRAW_SIZE/2, e.y + DRAW_SIZE/2));
-            floatTexts.push(createFloatText(e.x, e.y - 10, '+1', '#FFD700'));
-            kills++;
-            updateUI();
-            flashScreen('rgba(255,220,0,0.18)');
-            // Advance champion
-            champ.targetX = Math.min(W * 0.55, champ.x + 30);
-            champ.state = 'running';
-          } else {
-            floatTexts.push(createFloatText(e.x, e.y - 10, 'HIT!', '#FF8800'));
-            e.vx *= 0.5; // slow enemy on hit
-          }
-        }
-        // Enemy hits champion (if champion not invincible and not slashing)
-        else if(champ.invincible <= 0) {
-          hp--;
-          champ.invincible = 90;
-          updateUI();
-          flashScreen('rgba(255,0,0,0.25)');
-          floatTexts.push(createFloatText(champ.x, champ.y - 10, '-1 HP', '#FF3333'));
-          e.state = 'dead';
-          e.deathTimer = 20;
-          if(hp <= 0) {
-            champ.state = 'dead';
-            setTimeout(endGame, 1200);
-          } else {
-            // Push champion back
-            champ.x -= 30;
-            champ.x = Math.max(20, champ.x);
-            champ.targetX = Math.max(60, champ.x - 20);
-            champ.state = 'retreating';
-          }
-        }
-      }
-
-      // Enemy escapes off left
-      if(e.x < -DRAW_SIZE) {
-        enemies.splice(i, 1);
-        if(champ.state !== 'dead' && champ.invincible <= 0) {
-          hp = Math.max(0, hp-1);
-          updateUI();
-          if(hp <= 0) { champ.state = 'dead'; setTimeout(endGame, 1200); }
-        }
-      }
-    }
-
-    // ── EXPLOSIONS ──
-    for(let i=explosions.length-1;i>=0;i--) {
-      const p = explosions[i];
-      p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 0.06;
-      if(p.life <= 0) explosions.splice(i,1);
-    }
-
-    // ── FLOAT TEXTS ──
-    for(let i=floatTexts.length-1;i>=0;i--) {
-      const t = floatTexts[i];
-      t.y += t.vy; t.life -= 0.025;
-      if(t.life <= 0) floatTexts.splice(i,1);
-    }
-  }
-
-  function getChampFrame() {
-    const tick = Math.floor(animTick / 8) % 2;
-    switch(champ.state) {
-      case 'idle': return SPRITES.champion.idle;
-      case 'running': return tick === 0 ? SPRITES.champion.run1 : SPRITES.champion.run2;
-      case 'retreating': return tick === 0 ? SPRITES.champion.run1 : SPRITES.champion.run2;
-      case 'combat': return tick === 0 ? SPRITES.champion.run1 : SPRITES.champion.run2;
-      case 'slash': return Math.floor(animTick/5)%2===0 ? SPRITES.champion.slash1 : SPRITES.champion.slash2;
-      case 'dead': return SPRITES.champion.idle;
-      default: return SPRITES.champion.idle;
-    }
-  }
-
-  function getEnemyFrame(e) {
-    const tick = Math.floor(animTick / 10) % 2;
-    const sp = SPRITES[e.type];
-    if(e.type === 'slime') return tick===0 ? sp.frame1 : sp.frame2;
-    if(e.type === 'skeleton') return tick===0 ? sp.frame1 : sp.frame2;
-    return sp.frame1;
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    if(!gameActive) {
-      // Draw dummy
-      renderSprite(ctx, SPRITES.dummy.frame, SPRITES.dummy.palette, dummy.x, dummy.y, SCALE, false);
-      // Draw champion idle (training)
-      renderSprite(ctx, SPRITES.champion.idle, SPRITES.champion.palette, champ.x, champ.y, SCALE, false);
-      return;
-    }
-
-    // ── Draw champion ──
-    const shouldBlink = champ.invincible > 0 && Math.floor(animTick/4)%2===0;
-    if(champ.state !== 'dead' && !shouldBlink) {
-      renderSprite(ctx, getChampFrame(), SPRITES.champion.palette, champ.x, champ.y, SCALE, false);
-    } else if(champ.state === 'dead') {
-      ctx.globalAlpha = 0.4;
-      renderSprite(ctx, SPRITES.champion.idle, SPRITES.champion.palette, champ.x, champ.y+8, SCALE, false);
-      ctx.globalAlpha = 1;
-    }
-
-    // ── Draw enemies (flipped, facing left) ──
-    enemies.forEach(e => {
-      if(e.state === 'dead') {
-        ctx.globalAlpha = 0.3;
-        renderSprite(ctx, getEnemyFrame(e), SPRITES[e.type].palette, e.x, e.y+10, SCALE, true);
-        ctx.globalAlpha = 1;
-      } else {
-        renderSprite(ctx, getEnemyFrame(e), SPRITES[e.type].palette, e.x, e.y, SCALE, true);
-      }
-    });
-
-    // ── Draw slash effect ──
-    if(champ.state === 'slash') {
-      const sx = champ.x + DRAW_SIZE + 4;
-      const sy = champ.y + DRAW_SIZE * 0.3;
-      ctx.save();
-      ctx.globalAlpha = 0.7;
-      const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, 30);
-      grad.addColorStop(0, '#FFFFFF');
-      grad.addColorStop(0.3, '#FFD700');
-      grad.addColorStop(1, 'rgba(255,200,0,0)');
-      ctx.fillStyle = grad;
+      // Add subtle purple glow dot (like a will-o-wisp eye)
+      ctx.fillStyle = 'rgba(180,100,255,0.35)';
       ctx.beginPath();
-      ctx.arc(sx, sy, 28, 0, Math.PI*2);
+      ctx.arc(0, -S*sc, S*sc*1.2, 0, Math.PI*2);
       ctx.fill();
-      ctx.restore();
     }
+    ctx.restore();
+  }
 
-    // ── Draw explosions ──
-    explosions.forEach(p => {
-      ctx.globalAlpha = p.life;
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
-    });
-    ctx.globalAlpha = 1;
+  /* ─────────────────── BIRDS ─────────────────── */
+  // Bird: { x, y, vx, vy, flapPhase, flapSpeed, scale }
+  let birds = [];
 
-    // ── Draw float texts ──
-    floatTexts.forEach(t => {
-      ctx.save();
-      ctx.globalAlpha = t.life;
-      ctx.fillStyle = t.color;
-      ctx.font = 'bold 14px "Press Start 2P", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#000';
-      ctx.fillText(t.text, t.x + 1, t.y + 1);
-      ctx.fillStyle = t.color;
-      ctx.fillText(t.text, t.x, t.y);
-      ctx.restore();
+  function spawnBird(){
+    const fromLeft = Math.random() < 0.5;
+    return {
+      x: fromLeft ? -60 : W + 60,
+      y: H * (0.08 + Math.random() * 0.32),
+      vx: fromLeft ? (0.6 + Math.random() * 0.8) : -(0.6 + Math.random() * 0.8),
+      vy: (Math.random() - 0.5) * 0.15,
+      flapPhase: Math.random() * Math.PI * 2,
+      flapSpeed: 0.12 + Math.random() * 0.08,
+      scale: 0.7 + Math.random() * 0.5,
+    };
+  }
+
+  function initBirds(){
+    birds = [];
+    for(let i=0;i<4;i++){
+      const b = spawnBird();
+      b.x = Math.random() * W;
+      birds.push(b);
+    }
+  }
+
+  /* Pixel-art bird — 2-frame flap */
+  function drawBird(x, y, flapPhase, sc, flipX){
+    ctx.save();
+    ctx.translate(x, y);
+    if(flipX) ctx.scale(-1, 1);
+    const wingUp = Math.sin(flapPhase) > 0;
+    const ps = S * sc * 0.5;
+    ctx.fillStyle = '#2d2d2d';
+    // Body: 3×2 pixels
+    ctx.fillRect(0, 0, 3*ps, 2*ps);
+    // Head
+    ctx.fillRect(3*ps, -ps, 2*ps, 2*ps);
+    // Beak
+    ctx.fillStyle = '#cc8800';
+    ctx.fillRect(5*ps, -ps*0.5, ps, ps);
+    // Eye
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(4*ps, -ps*0.8, ps*0.6, ps*0.6);
+    // Wings
+    ctx.fillStyle = '#444';
+    if(wingUp){
+      // wings up
+      ctx.fillRect(-2*ps, -2*ps, 2*ps, ps);
+      ctx.fillRect(3*ps, -2*ps, 2*ps, ps);
+    } else {
+      // wings down
+      ctx.fillRect(-2*ps, ps, 2*ps, ps);
+      ctx.fillRect(3*ps, ps, 2*ps, ps);
+    }
+    // Tail
+    ctx.fillStyle = '#2d2d2d';
+    ctx.fillRect(-2*ps, 0, 2*ps, ps);
+    ctx.restore();
+  }
+
+  /* ─────────────────── BATS ─────────────────── */
+  let bats = [];
+
+  function spawnBat(){
+    const fromLeft = Math.random() < 0.5;
+    return {
+      x: fromLeft ? -80 : W + 80,
+      y: H * (0.05 + Math.random() * 0.45),
+      vx: fromLeft ? (0.5 + Math.random() * 1.0) : -(0.5 + Math.random() * 1.0),
+      vy: (Math.random() - 0.5) * 0.2,
+      flapPhase: Math.random() * Math.PI * 2,
+      flapSpeed: 0.16 + Math.random() * 0.10,
+      swoopPhase: Math.random() * Math.PI * 2,
+      swoopSpeed: 0.018 + Math.random() * 0.012,
+      swoopAmp: 18 + Math.random() * 24,
+      scale: 0.8 + Math.random() * 0.5,
+    };
+  }
+
+  function initBats(){
+    bats = [];
+    for(let i=0;i<4;i++){
+      const b = spawnBat();
+      b.x = Math.random() * W;
+      bats.push(b);
+    }
+  }
+
+  /* Pixel-art bat — big membrane wings, cute evil */
+  function drawBat(x, y, flapPhase, sc, flipX){
+    ctx.save();
+    ctx.translate(x, y);
+    if(flipX) ctx.scale(-1, 1);
+    const ps = S * sc * 0.55;
+    const wingUp = Math.sin(flapPhase) > 0;
+
+    // Body
+    ctx.fillStyle = '#1a0d2e';
+    ctx.fillRect(-ps, -ps, 2*ps, 2*ps);
+    // Head — slightly above body
+    ctx.fillRect(-ps*0.8, -2.5*ps, 1.6*ps, 1.8*ps);
+    // Ears (pointy)
+    ctx.fillStyle = '#2d1a4e';
+    ctx.fillRect(-ps*0.9, -4*ps, ps*0.5, 1.5*ps);
+    ctx.fillRect(ps*0.4, -4*ps, ps*0.5, 1.5*ps);
+    // Eyes (red glow)
+    ctx.fillStyle = '#ff2244';
+    ctx.fillRect(-ps*0.7, -2.8*ps, ps*0.4, ps*0.4);
+    ctx.fillRect(ps*0.3, -2.8*ps, ps*0.4, ps*0.4);
+
+    // Wing membranes — large and dramatic
+    ctx.fillStyle = '#2a1040';
+    if(wingUp){
+      // wings up — spread wide above body
+      // Left wing
+      for(let i=0;i<5;i++){
+        ctx.fillRect(-(3+i)*ps, -(1+i*0.5)*ps, ps*1.1, ps);
+      }
+      // Right wing
+      for(let i=0;i<5;i++){
+        ctx.fillRect((2+i)*ps, -(1+i*0.5)*ps, ps*1.1, ps);
+      }
+      // Wing tips
+      ctx.fillRect(-8*ps, -3.5*ps, ps*1.2, ps*0.8);
+      ctx.fillRect(7*ps,  -3.5*ps, ps*1.2, ps*0.8);
+    } else {
+      // wings down — dip below body
+      for(let i=0;i<5;i++){
+        ctx.fillRect(-(3+i)*ps, (0+i*0.4)*ps, ps*1.1, ps);
+      }
+      for(let i=0;i<5;i++){
+        ctx.fillRect((2+i)*ps, (0+i*0.4)*ps, ps*1.1, ps);
+      }
+      ctx.fillRect(-8*ps, 2*ps, ps*1.2, ps*0.8);
+      ctx.fillRect(7*ps,  2*ps, ps*1.2, ps*0.8);
+    }
+    ctx.restore();
+  }
+
+  /* ─────────────────── BUTTERFLIES (day) ─────────────────── */
+  let butterflies = [];
+
+  function spawnButterfly(){
+    const groundTop = H - 48;
+    return {
+      x: Math.random() * W,
+      y: groundTop - (10 + Math.random() * 70),
+      baseY: 0,
+      vx: (Math.random() < 0.5 ? -1 : 1) * (0.4 + Math.random() * 0.5),
+      flapPhase: Math.random() * Math.PI * 2,
+      flapSpeed: 0.18 + Math.random() * 0.1,
+      bobPhase: Math.random() * Math.PI * 2,
+      bobSpeed: 0.03 + Math.random() * 0.02,
+      bobAmp: 6 + Math.random() * 10,
+      hue: Math.floor(Math.random()*4),
+      scale: 0.7 + Math.random() * 0.6,
+    };
+  }
+
+  function initButterflies(){
+    butterflies = [];
+    const groundTop = H - 48;
+    for(let i=0;i<6;i++){
+      const b = spawnButterfly();
+      b.baseY = groundTop - (10 + Math.random() * 70);
+      butterflies.push(b);
+    }
+  }
+
+  const BUTTERFLY_COLORS = [
+    ['#ff6fa5', '#ffd1e3'],
+    ['#ffd24a', '#fff3c2'],
+    ['#6fc8ff', '#d6f0ff'],
+    ['#b388ff', '#e8d9ff'],
+  ];
+
+  function drawButterfly(x, y, flapPhase, sc, colorPair){
+    ctx.save();
+    ctx.translate(x, y);
+    const wingSpread = Math.abs(Math.sin(flapPhase));
+    const ps = S * sc * 0.45;
+    const [dark, light] = colorPair;
+
+    // Body
+    ctx.fillStyle = '#3a2a1a';
+    ctx.fillRect(-ps*0.25, -ps*1.2, ps*0.5, ps*2.4);
+
+    // Wings — scale horizontally with flap for flutter effect
+    ctx.save();
+    ctx.scale(0.3 + wingSpread*0.9, 1);
+    // Left wing pair
+    ctx.fillStyle = dark;
+    ctx.fillRect(-ps*3.2, -ps*2.0, ps*2.2, ps*1.6);
+    ctx.fillStyle = light;
+    ctx.fillRect(-ps*2.6, -ps*0.5, ps*1.6, ps*1.3);
+    // Right wing pair
+    ctx.fillStyle = dark;
+    ctx.fillRect(ps*1.0, -ps*2.0, ps*2.2, ps*1.6);
+    ctx.fillStyle = light;
+    ctx.fillRect(ps*1.0, -ps*0.5, ps*1.6, ps*1.3);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  /* ─────────────────── NIGHT MIST WISPS ─────────────────── */
+  let wisps = [];
+  function spawnWisp(){
+    return {
+      x: Math.random() * W,
+      y: H - 20 - Math.random()*40,
+      r: 30 + Math.random()*50,
+      speed: 0.08 + Math.random()*0.15,
+      phase: Math.random()*Math.PI*2,
+    };
+  }
+  function initWisps(){
+    wisps = [];
+    for(let i=0;i<8;i++) wisps.push(spawnWisp());
+  }
+  function drawWisps(){
+    wisps.forEach(w=>{
+      w.phase += 0.01;
+      w.x += w.speed;
+      if(w.x - w.r > W) w.x = -w.r;
+      const grad = ctx.createRadialGradient(w.x, w.y, 0, w.x, w.y, w.r);
+      grad.addColorStop(0, 'rgba(120,80,160,0.18)');
+      grad.addColorStop(1, 'rgba(120,80,160,0)');
+      ctx.beginPath();
+      ctx.arc(w.x, w.y + Math.sin(w.phase)*4, w.r, 0, Math.PI*2);
+      ctx.fillStyle = grad;
+      ctx.fill();
     });
   }
 
-  function loop(ts) {
-    const dt = ts - lastTime;
-    lastTime = ts;
-    update(dt);
-    draw();
+  /* ─────────────────── MAIN LOOP ─────────────────── */
+  function loop(){
+    ctx.clearRect(0, 0, W, H);
+    tick++;
+
+    const night = isNight();
+
+    /* Draw trees — behind everything, at ground level */
+    trees.forEach(t => {
+      t.swayPhase += t.swaySpeed;
+      const swayAngle = Math.sin(t.swayPhase) * (night ? 0.04 : 0.025);
+      drawTree(t.x, t.groundY, swayAngle, t.scale, night);
+    });
+
+    if(!night){
+      /* ── DAY: birds + butterflies ── */
+      birds.forEach((b, i) => {
+        b.flapPhase += b.flapSpeed;
+        b.x += b.vx;
+        b.y += b.vy + Math.sin(b.flapPhase * 0.3) * 0.3;
+        const flipX = b.vx < 0;
+        drawBird(b.x, b.y, b.flapPhase, b.scale, flipX);
+        // respawn when off screen
+        if(b.x < -100 || b.x > W + 100){
+          birds[i] = spawnBird();
+        }
+      });
+
+      butterflies.forEach((b) => {
+        b.flapPhase += b.flapSpeed;
+        b.bobPhase += b.bobSpeed;
+        b.x += b.vx;
+        if(b.x < -20) b.x = W + 20;
+        if(b.x > W + 20) b.x = -20;
+        const y = b.baseY + Math.sin(b.bobPhase) * b.bobAmp;
+        drawButterfly(b.x, y, b.flapPhase, b.scale, BUTTERFLY_COLORS[b.hue]);
+      });
+    } else {
+      /* ── NIGHT: bats + ground mist wisps ── */
+      drawWisps();
+      bats.forEach((b, i) => {
+        b.flapPhase  += b.flapSpeed;
+        b.swoopPhase += b.swoopSpeed;
+        b.x += b.vx;
+        b.y += b.vy + Math.sin(b.swoopPhase) * b.swoopAmp * 0.04;
+        const flipX = b.vx < 0;
+        drawBat(b.x, b.y, b.flapPhase, b.scale, flipX);
+        if(b.x < -120 || b.x > W + 120){
+          bats[i] = spawnBat();
+        }
+      });
+    }
+
     requestAnimationFrame(loop);
   }
 
-  // ── GAME PROMPT BUTTON — direct, reliable click ──
-  gamePrompt.addEventListener('click', () => startGame());
-  gamePrompt.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
-
   resize();
+  initBirds();
+  initBats();
+  initButterflies();
+  initWisps();
   window.addEventListener('resize', resize);
-  bestDisplay.textContent = bestKills;
   requestAnimationFrame(loop);
 })();
 </script>
