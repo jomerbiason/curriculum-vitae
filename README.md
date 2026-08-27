@@ -1,10 +1,10 @@
-# Interactive RPG Portfolio
+# Retro Pixel Portfolio
 
 🔗 **Live Site:** [jomerbiason.github.io/curriculum-vitae](https://jomerbiason.github.io/curriculum-vitae/)
 
-An interactive portfolio website built using vanilla HTML, CSS, and JavaScript.
+An interactive CV/portfolio site built with vanilla HTML, CSS, and JavaScript — no frameworks, no build step.
 
-Unlike a traditional portfolio, this project combines front-end engineering techniques with game-inspired UI/UX, procedural canvas rendering, and lightweight animation systems without relying on external frameworks.
+Instead of a static resume page, this project uses a retro pixel-art theme (day/night sky, parallax canvas scenery, animated clouds) to present the same information a traditional CV would: experience, education, skills, projects, certifications, and contact info.
 
 ---
 
@@ -21,7 +21,7 @@ Browser
 │     └── SEO / Social Metadata
 │
 ├── CSS
-│     ├── Theme Engine
+│     ├── Theme Engine (day/night, CSS variables)
 │     ├── Pixel UI
 │     ├── Responsive Layout
 │     ├── Animations
@@ -30,12 +30,8 @@ Browser
 │
 └── JavaScript
       ├── Theme Controller
-      ├── Canvas Renderer
-      ├── Particle Engine
+      ├── Canvas Renderer (stars, wind/mist, sky scene)
       ├── Navigation Observer
-      ├── RPG Minigame
-      ├── State Management
-      ├── UI Effects
       └── Contact Obfuscation
 ```
 
@@ -43,12 +39,9 @@ Browser
 
 # Project Goals
 
-The project was designed around four objectives.
-
-- Demonstrate modern frontend development without frameworks.
-- Showcase interactive UI design.
-- Build an animated portfolio with minimal dependencies.
-- Keep the entire project inside a single HTML file.
+- Demonstrate front-end development without frameworks.
+- Present a resume in a memorable, interactive way without sacrificing scannability.
+- Keep the entire experience inside a single HTML file with no external JS dependencies.
 
 ---
 
@@ -59,11 +52,11 @@ The project was designed around four objectives.
 | HTML5 | Semantic document structure |
 | CSS3 | Component styling and animations |
 | CSS Variables | Runtime theme switching |
-| Canvas API | Rendering sprites, particles and game objects |
+| Canvas API | Rendering the animated sky/cloud/star scenery |
 | JavaScript ES6 | Application logic |
-| LocalStorage | Theme persistence and high score storage |
-| IntersectionObserver | Active navigation and lazy animations |
-| requestAnimationFrame | Smooth rendering loop |
+| LocalStorage | Theme preference persistence |
+| IntersectionObserver | Active navigation highlighting and panel fade-in |
+| requestAnimationFrame | Smooth canvas rendering loops |
 | matchMedia | Reduced-motion detection |
 | Open Graph / JSON-LD | Link previews and structured data for search engines |
 | Web App Manifest | Home-screen installability |
@@ -71,8 +64,6 @@ The project was designed around four objectives.
 ---
 
 # HTML Structure
-
-The application is divided into reusable sections.
 
 ```
 index.html
@@ -87,13 +78,13 @@ index.html
 ├── References
 ├── Contact
 │
-├── Game Canvas
-├── Wind Canvas
-├── Stars Canvas
+├── Sky Scene Canvas (clouds, sun/moon)
+├── Wind/Mist Canvas
+├── World Canvas (parallax scenery)
 └── Navigation
 ```
 
-Each section is isolated using semantic `<section>` elements for accessibility and easier maintenance.
+Each resume section is isolated in a semantic `<section>` for accessibility and easier maintenance.
 
 ---
 
@@ -101,261 +92,70 @@ Each section is isolated using semantic `<section>` elements for accessibility a
 
 The portfolio supports automatic day and night themes.
 
-Implementation:
-
-- CSS Custom Properties
-- JavaScript theme controller
-- LocalStorage persistence
-- Automatic switching based on local time
+- CSS Custom Properties drive every color
+- A JavaScript controller sets `data-theme` on `<html>`
+- The choice is persisted in LocalStorage once the visitor manually toggles it
+- Falls back to automatic switching based on local time until a manual choice is made
 
 ```
-:root
-↓
-
-CSS Variables
-
-↓
-
-JavaScript updates data-theme
-
-↓
-
-Entire interface recolors instantly
+:root → CSS Variables → JS sets data-theme → interface recolors instantly
 ```
-
-No duplicate stylesheets are required because every color is referenced through CSS variables.
 
 ---
 
 # Canvas Rendering
 
-Multiple independent canvas layers are used.
+Three independent canvas layers create the atmosphere.
 
 ## Stars Canvas
+Renders animated twinkling stars during night mode.
 
-Responsible for rendering animated stars during night mode.
+## Wind / Mist Canvas
+A lightweight particle system (position, velocity, opacity, lifetime) produces drifting fog without video or GIF assets.
 
-Uses
+## World / Sky Canvas
+Pixel-art clouds, a sun/moon with day/night rendering, a hot-air balloon, and an aerial banner plane drift across the scene — purely canvas-drawn, no image assets.
 
-- requestAnimationFrame
-- Random star generation
-- Alpha oscillation
-- Canvas drawing
-
----
-
-## Wind Canvas
-
-Creates moving fog and wind.
-
-Features
-
-- Radial gradients
-- Particle pooling
-- Continuous spawning
-- Velocity simulation
-- Opacity decay
-
-This produces a lightweight atmospheric effect without using videos or GIFs.
-
----
-
-## World Canvas
-
-Renders the scrolling background scene — trees, lamp posts, oncoming traffic, the foreground car, and time-of-day creatures (birds and butterflies by day, bats and mist wisps by night).
-
-Features
-
-- Parallax scrolling by depth
-- Procedural pixel-art trees with day/night variants
-- Stationary "moving" car illusion via scrolling road, streak lines, and spinning wheel spokes
-- Spawned oncoming traffic (cars, motorcycles, buses)
-
----
-
-## Game Canvas
-
-Contains the RPG minigame.
-
-Responsible for
-
-- Character rendering
-- Enemy rendering
-- Collision detection
-- Animation states
-- Combat
-- Score system
-
-Sprites are rendered programmatically from pixel arrays rather than image assets.
-
----
-
-# Sprite Engine
-
-Instead of PNG sprite sheets, every sprite is defined as a 16×16 matrix.
-
-Example
-
-```
-[
-0,0,2,2,2,
-0,2,1,1,2,
-...
-]
-```
-
-Each number maps to a color palette.
-
-Advantages
-
-- No image downloads
-- Easy recoloring
-- Small project size
-- Fully customizable
+All three respect `prefers-reduced-motion` and skip initialization entirely when it's enabled.
 
 ---
 
 # Navigation System
 
-Navigation highlighting is powered by the Intersection Observer API.
-
-Benefits
-
-- Better performance than scroll events
-- Minimal CPU usage
-- Automatic active state
-- Smooth user experience
+Section highlighting in the nav bar is powered by the Intersection Observer API instead of scroll-position calculations, for lower CPU usage and a smoother active-state transition.
 
 ---
 
 # Animation Engine
 
-Animations use native browser APIs.
+Built entirely on native browser APIs: `requestAnimationFrame`, CSS keyframes/transitions, and transform/opacity interpolation. No animation libraries.
 
-Primary techniques include
-
-- requestAnimationFrame
-- CSS Keyframes
-- CSS Transitions
-- Transform animations
-- Opacity interpolation
-
-No animation libraries are used.
-
-All canvas-driven animation loops check `prefers-reduced-motion` on load and skip initialization entirely for visitors who have that preference enabled, in addition to disabling CSS keyframe animations (fog drift, badge blink, panel fade-in, road scroll) via a dedicated media query.
-
----
-
-# Particle System
-
-The wind effect uses a lightweight particle engine.
-
-Each particle stores
-
-```
-Position
-Velocity
-Opacity
-Lifetime
-Size
-Gradient
-```
-
-Every animation frame
-
-```
-Move
-
-↓
-
-Fade
-
-↓
-
-Destroy
-
-↓
-
-Respawn
-```
-
-This avoids memory leaks while maintaining a constant particle count.
-
----
-
-# State Management
-
-Application state is maintained using plain JavaScript objects.
-
-Examples
-
-```
-Theme
-
-↓
-
-Game Running
-
-↓
-
-Enemy States
-
-↓
-
-Player Health
-
-↓
-
-High Score
-```
-
-Persistent values are synchronized with LocalStorage.
+Every canvas loop checks `prefers-reduced-motion` before starting and skips initialization for visitors who have that preference enabled; decorative CSS keyframe animations (fog drift, badge blink, panel fade-in, road scroll) are disabled via the same media query.
 
 ---
 
 # Performance Considerations
 
-Several optimizations are included.
-
-- CSS Variables instead of duplicate themes
-- requestAnimationFrame rendering
-- Intersection Observer
-- Canvas rendering
-- Minimal DOM updates
-- Hardware accelerated transforms
-- Local sprite rendering
-- No external JavaScript libraries
-- Debounced resize handling (150ms) across all canvas layers to avoid redundant re-initialization during window dragging
-- `prefers-reduced-motion` short-circuits canvas animation loops before they start, reducing CPU/battery usage for users who opt out of motion
+- CSS Variables instead of duplicated per-theme stylesheets
+- `requestAnimationFrame` for all canvas rendering
+- Intersection Observer instead of scroll listeners
+- Debounced resize handling (150ms) across all canvas layers
+- `prefers-reduced-motion` short-circuits animation loops before they start
 
 ---
 
 # Responsive Design
 
-Responsive behavior is handled entirely through CSS media queries.
-
-Adaptations include
-
-- Navigation resizing
-- Card layout changes
-- Typography scaling
-- Grid restructuring
-- Mobile spacing adjustments
-- Reduced-motion adaptations for users with vestibular or motion sensitivity
+Handled entirely through CSS media queries: navigation sizing, card/grid layout changes, typography scaling, and mobile spacing adjustments.
 
 ---
 
 # Accessibility
 
-The project includes
-
-- Semantic HTML
-- ARIA labels
+- Semantic HTML and ARIA labels
 - Keyboard-friendly navigation
-- Responsive scaling
-- Lazy loaded images
-- Descriptive alt attributes
-- `prefers-reduced-motion` support that disables decorative canvas/CSS animation
+- Lazy-loaded certificate images with descriptive alt attributes
+- `prefers-reduced-motion` support that disables decorative animation
 - Keyboard-operable contact reveal controls (`role="button"`, `tabindex`, Enter/Space activation)
 
 ---
@@ -367,8 +167,6 @@ Reference contact emails are not present as plain text in the page source. Each 
 ---
 
 # SEO & Social Sharing
-
-The site includes metadata so links shared on social platforms render as proper preview cards rather than bare URLs, and so search engines can parse the page as a professional profile.
 
 - Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`)
 - Twitter Card tags
@@ -402,20 +200,13 @@ A themed `404.html` page is served automatically by GitHub Pages for any unmatch
 ├── manifest.json
 ├── certs/
 ├── README.md
-├── favicon
-└── resume.pdf
+└── JomerAntoniegoBiason_CurriculumVitae.pdf
 ```
 
 ---
 
 # Future Improvements
 
-- Modular JavaScript architecture
-- Web Components
-- Asset pipeline
-- Sprite editor
-- Procedural enemy AI
-- Save game system
-- Full offline PWA support (service worker + asset caching)
-- TypeScript migration
 - Automated Lighthouse/accessibility CI checks
+- TypeScript migration
+- Full offline PWA support (service worker + asset caching)
