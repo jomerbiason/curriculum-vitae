@@ -200,29 +200,35 @@ body {
   background-color: var(--asphalt-day);
   background-image:
     linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 30%),
+    radial-gradient(circle at 6px 12px, rgba(0,0,0,0.22) 1.6px, transparent 2px),
+    radial-gradient(circle at 20px 32px, rgba(255,255,255,0.06) 1.2px, transparent 1.8px),
+    radial-gradient(circle at 42px 20px, rgba(0,0,0,0.16) 1.3px, transparent 1.8px),
     repeating-linear-gradient(90deg,
       #f4d35e 0px, #f4d35e 28px,
       transparent 28px, transparent 56px
     );
-  background-position: 0 0, 0 22px;
-  background-size: auto, 56px 6px;
-  background-repeat: repeat, repeat-x;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 22px;
+  background-size: auto, 56px 48px, 56px 48px, 56px 48px, 56px 6px;
+  background-repeat: repeat, repeat, repeat, repeat, repeat-x;
   border-top: 4px solid #2c2c34;
   transition: background-color 1.2s, border-color 1.2s;
-  animation: roadScroll 1.4s linear infinite;
+  animation: roadScroll 1.037s linear infinite;
 }
 [data-theme="night"] .ground-stripe {
   background-color: var(--asphalt-night);
   background-image:
     linear-gradient(to bottom, rgba(255,255,255,0.03) 0%, transparent 30%),
+    radial-gradient(circle at 6px 12px, rgba(0,0,0,0.3) 1.6px, transparent 2px),
+    radial-gradient(circle at 20px 32px, rgba(255,255,255,0.04) 1.2px, transparent 1.8px),
+    radial-gradient(circle at 42px 20px, rgba(0,0,0,0.24) 1.3px, transparent 1.8px),
     repeating-linear-gradient(90deg,
       #d8c060 0px, #d8c060 28px,
       transparent 28px, transparent 56px
     );
 }
 @keyframes roadScroll {
-  from { background-position: 0 0, 0 22px; }
-  to   { background-position: -56px 0, -56px 22px; }
+  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 22px; }
+  to   { background-position: -56px 0, -56px 0, -56px 0, -56px 0, -56px 22px; }
 }
 .ground-stripe::before {
   content:'';
@@ -286,9 +292,11 @@ nav a:hover, nav a.active { color: #fff; border-color: var(--border); background
 #theme-btn {
   font-family: 'Press Start 2P', monospace; font-size: 9px; background: transparent;
   border: 2px solid var(--border); color: var(--border); padding: 6px 10px;
-  cursor: pointer; white-space: nowrap; transition: background 0.2s, color 0.2s;
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.2s, color 0.2s, opacity 0.15s, transform 0.15s;
 }
 #theme-btn:hover { background: var(--border); color: #000; }
+#theme-btn.theme-btn-swap { opacity: 0; transform: scale(0.75) rotate(-15deg); }
 
 /* ── MAIN ── */
 main {
@@ -517,6 +525,19 @@ footer a { color: var(--link); }
 @media (max-width: 600px) {
   .nav-fade.right.visible, .nav-fade.left.visible { display: block; }
 }
+
+/* ── KEYBOARD FOCUS ── */
+a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 1px;
+}
+[data-theme="night"] a:focus-visible,
+[data-theme="night"] button:focus-visible,
+[data-theme="night"] summary:focus-visible,
+[data-theme="night"] [tabindex]:focus-visible {
+  outline-color: var(--night-border);
+}
+nav a:focus-visible { outline-offset: -2px; }
+.cert-open:focus-visible { outline-offset: 2px; }
 
 /* ── PRINT ── */
 @media print {
@@ -1209,11 +1230,20 @@ function debounce(fn, wait){
   const btn = document.getElementById('theme-btn');
   const body = document.documentElement;
   let manual = false;
-  function applyTheme(t){ body.setAttribute('data-theme',t); btn.textContent = t==='night'?'☀️ DAY':'🌙 NIGHT'; }
-  function autoTheme(){ if(manual) return; const h=new Date().getHours(); applyTheme((h>=6&&h<18)?'day':'night'); }
+  function setLabel(t){ btn.textContent = t==='night'?'☀️ DAY':'🌙 NIGHT'; }
+  function applyTheme(t, animate){
+    body.setAttribute('data-theme', t);
+    if(animate && !prefersReducedMotion){
+      btn.classList.add('theme-btn-swap');
+      setTimeout(()=>{ setLabel(t); btn.classList.remove('theme-btn-swap'); }, 150);
+    } else {
+      setLabel(t);
+    }
+  }
+  function autoTheme(){ if(manual) return; const h=new Date().getHours(); applyTheme((h>=6&&h<18)?'day':'night', true); }
   const saved = localStorage.getItem('jomer-theme');
-  if(saved){ manual=true; applyTheme(saved); } else { autoTheme(); }
-  btn.addEventListener('click',()=>{ manual=true; const c=body.getAttribute('data-theme'); const n=c==='night'?'day':'night'; applyTheme(n); localStorage.setItem('jomer-theme',n); });
+  if(saved){ manual=true; applyTheme(saved, false); } else { autoTheme(); }
+  btn.addEventListener('click',()=>{ manual=true; const c=body.getAttribute('data-theme'); const n=c==='night'?'day':'night'; applyTheme(n, true); localStorage.setItem('jomer-theme',n); });
   setInterval(autoTheme,60000);
 })();
 
