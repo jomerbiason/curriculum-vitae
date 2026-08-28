@@ -1048,20 +1048,15 @@ function debounce(fn, wait){
     ctx.restore();
   }
 
-  /* ─────────────────── AERIAL ADVERTISING PLANE ─────────────────── */
-  const AD_MESSAGES = ['THANK YOU FOR THE VISIT'];
+  /* ─────────────────── SMALL PROP PLANE (no banner) ─────────────────── */
   let adPlane = null;
   let adSpawnTimer = 1800; // ~30s at 60fps
-  let adMsgIndex = 0;
 
   function spawnAdPlane(){
-    const msg = AD_MESSAGES[adMsgIndex % AD_MESSAGES.length];
-    adMsgIndex++;
     return {
       x: -260,
       y: H * (0.16 + Math.random()*0.14),
       speed: 1.1 + Math.random()*0.3,
-      message: msg,
     };
   }
 
@@ -1069,11 +1064,6 @@ function debounce(fn, wait){
     const ps = 2.0;
     ctx.save();
     ctx.translate(p.x, p.y);
-
-    // tow line
-    ctx.strokeStyle = night ? 'rgba(220,220,220,0.4)' : 'rgba(60,60,60,0.5)';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(-ps*5, 0); ctx.lineTo(-ps*9, 0); ctx.stroke();
 
     const bodyColor = night ? '#cfd6e0' : '#f4f4f4';
     const shadeColor = night ? '#8fa0b8' : '#c43b3b';
@@ -1108,24 +1098,6 @@ function debounce(fn, wait){
     ctx.fillStyle = night ? 'rgba(180,220,255,0.5)' : 'rgba(140,200,255,0.85)';
     ctx.fillRect(ps*1.4, -ps*0.55, ps*1.6, ps*0.9);
 
-    // banner
-    ctx.font = "10px 'Press Start 2P', monospace";
-    const textW = ctx.measureText(p.message).width;
-    const bannerW = textW + ps*8;
-    const bannerH = ps*5;
-    const bx = -ps*9 - bannerW;
-    const by = -bannerH/2;
-
-    ctx.fillStyle = night ? 'rgba(20,20,30,0.85)' : 'rgba(255,255,255,0.92)';
-    ctx.fillRect(bx, by, bannerW, bannerH);
-    ctx.strokeStyle = night ? '#00ff88' : '#8B6914';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(bx, by, bannerW, bannerH);
-
-    ctx.fillStyle = night ? '#aaffcc' : '#1a1a2e';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(p.message, bx + ps*4, by + bannerH/2 + 1);
-
     ctx.restore();
   }
   function loop(){
@@ -1150,7 +1122,7 @@ function debounce(fn, wait){
       }
     }
 
-    // aerial advertising plane (left → right, daytime only, towing a banner)
+    // small prop plane (left → right, daytime only)
     if(night){
       adPlane = null;
     } else {
@@ -1165,7 +1137,7 @@ function debounce(fn, wait){
       }
     }
 
-    // clouds drawn last so they visually pass in front of the sun, balloon, and banner plane
+    // clouds drawn last so they visually pass in front of the sun, balloon, and plane
     clouds.forEach(c => {
       // right → left drift
       c.x -= c.speed * (0.4 + c.depth) * 1.6;
