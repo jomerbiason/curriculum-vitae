@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, Software Developer, IT Support — 12+ years hands-on tech experience.">
 <title>Jomer Biason | Portfolio</title>
-<link rel="icon" href="https://github.com/jomerbiason.png"/>
+<link rel="icon" type="image/jpeg" href="profile.jpg"/>
 <meta name="theme-color" content="#3d2b1f"/>
 <link rel="manifest" href="manifest.json"/>
 
@@ -14,13 +14,13 @@
 <meta property="og:title" content="Jomer Biason | Portfolio"/>
 <meta property="og:description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, Software Developer, IT Support — 12+ years hands-on tech experience."/>
 <meta property="og:url" content="https://jomerbiason.github.io/curriculum-vitae/"/>
-<meta property="og:image" content="https://github.com/jomerbiason.png"/>
+<meta property="og:image" content="https://jomerbiason.github.io/curriculum-vitae/profile.jpg"/>
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Jomer Biason | Portfolio"/>
 <meta name="twitter:description" content="Portfolio of Jomer Antoniego Biason — MIS Assistant, Software Developer, IT Support — 12+ years hands-on tech experience."/>
-<meta name="twitter:image" content="https://github.com/jomerbiason.png"/>
+<meta name="twitter:image" content="https://jomerbiason.github.io/curriculum-vitae/profile.jpg"/>
 
 <!-- Structured data so search engines understand this is a CV/profile page -->
 <script type="application/ld+json">
@@ -30,7 +30,7 @@
   "name": "Jomer Antoniego Biason",
   "jobTitle": "MIS Assistant / Software Developer / IT Support",
   "url": "https://jomerbiason.github.io/curriculum-vitae/",
-  "image": "https://github.com/jomerbiason.png",
+  "image": "https://jomerbiason.github.io/curriculum-vitae/profile.jpg",
   "email": "mailto:jomerbiason@gmail.com",
   "address": {
     "@type": "PostalAddress",
@@ -299,11 +299,12 @@ main {
 /* ── HERO ── */
 .hero { margin: 2rem 0 2.5rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .hero-avatar {
-  width: 80px; height: 80px; border: 4px solid var(--border); border-radius: 0;
-  image-rendering: pixelated; flex-shrink: 0; background: var(--panel);
-  display: flex; align-items: center; justify-content: center; font-size: 48px;
+  width: 88px; height: 88px; border: 4px solid var(--border); border-radius: 0;
+  flex-shrink: 0; background: var(--panel); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
   box-shadow: 4px 4px 0 #000; transition: border-color 0.4s;
 }
+.hero-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
 .hero-text h1 {
   font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--accent);
   text-shadow: 2px 2px 0 #000; line-height: 1.6; margin-bottom: 6px;
@@ -342,9 +343,6 @@ main {
 /* ── SKILLS ── */
 .skill-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
 .skill-name { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--text); min-width: 175px; }
-.hearts { display: flex; gap: 2px; }
-.heart { font-size: 14px; }
-.heart.empty { opacity: 0.2; }
 
 /* ── QUEST ── */
 .quest { border-left: 4px solid var(--border); padding-left: 1rem; margin-bottom: 1.2rem; transition: border-color 0.4s; }
@@ -433,6 +431,65 @@ footer a { color: var(--link); }
   .cert-grid { grid-template-columns: 1fr; }
 }
 
+/* ── LIGHTBOX ── */
+.cert-open { border: none; background: none; padding: 0; margin: 0; cursor: zoom-in; display: block; width: 100%; }
+.lightbox {
+  position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.88);
+  display: flex; align-items: center; justify-content: center; padding: 2rem;
+  animation: lbFade 0.15s ease both;
+}
+.lightbox[hidden] { display: none; }
+@keyframes lbFade { from { opacity: 0; } to { opacity: 1; } }
+.lightbox figure { margin: 0; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+.lightbox img { max-width: 90vw; max-height: 78vh; object-fit: contain; border: 4px solid var(--night-border); box-shadow: 0 0 24px rgba(0,255,136,0.35); }
+.lightbox figcaption { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #d4ffd4; text-align: center; line-height: 1.6; }
+.lightbox-close {
+  position: absolute; top: 1rem; right: 1.25rem; font-family: 'Press Start 2P', monospace; font-size: 14px;
+  background: transparent; border: 2px solid #00ff88; color: #00ff88; padding: 8px 12px; cursor: pointer;
+}
+.lightbox-close:hover { background: #00ff88; color: #000; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+  font-family: 'Press Start 2P', monospace; font-size: 9px; background: #000; color: #0f0;
+  border: 2px solid #0f0; padding: 10px 16px; z-index: 1100; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s; box-shadow: 3px 3px 0 rgba(0,255,0,0.3);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── SKILL BARS ── */
+.skill-bar-track { flex: 1; min-width: 100px; height: 12px; border: 2px solid var(--border); background: color-mix(in srgb, var(--panel) 70%, #000 30%); position: relative; }
+.skill-bar-fill { height: 100%; width: 0%; background: var(--accent); transition: width 1s ease; }
+[data-theme="night"] .skill-bar-fill { background: var(--night-border); }
+.skill-bar-pct { font-size: 13px; color: var(--border); min-width: 34px; text-align: right; }
+
+/* ── NAV SCROLL HINT (mobile) ── */
+.nav-wrap { position: relative; display: flex; align-items: center; flex: 1; min-width: 0; }
+.nav-fade { position: absolute; top: 0; bottom: 0; width: 22px; pointer-events: none; display: none; }
+.nav-fade.right { right: 0; background: linear-gradient(to right, transparent, var(--header)); }
+.nav-fade.left { left: 0; background: linear-gradient(to left, transparent, var(--header)); }
+@media (max-width: 600px) {
+  .nav-fade.right.visible, .nav-fade.left.visible { display: block; }
+}
+
+/* ── PRINT ── */
+@media print {
+  #sky-scene, #fog-overlay, #wind-canvas, #world-canvas, .ground-stripe,
+  header, footer, #theme-btn, #cert-lightbox, .toast, .nav-fade,
+  .hero-text .open-badge, .btn-pixel, .chest-link { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  main { max-width: 100%; padding: 0; }
+  /* Force readable black text everywhere, regardless of day/night theme —
+     otherwise printing while in night mode leaves light-colored text
+     (var(--text) resolving to the night palette) on this forced-white page. */
+  main, main * { color: #000 !important; text-shadow: none !important; }
+  .panel { background: #fff !important; border: 1px solid #333 !important; box-shadow: none !important; break-inside: avoid; }
+  .skill-bar-track { border-color: #333 !important; background: #eee !important; }
+  .skill-bar-fill { background: #333 !important; }
+  a { color: #000 !important; text-decoration: underline; }
+}
+
 /* ── REDUCED MOTION ── */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -471,22 +528,26 @@ footer a { color: var(--link); }
 <!-- HEADER -->
 <header>
   <span class="nav-logo"><span class="torch" aria-hidden="true">🔥</span>JOMER BIASON<span class="torch" aria-hidden="true" style="animation-delay:0.2s;">🔥</span></span>
-  <nav id="main-nav">
-    <a href="#objective">ABOUT</a>
-    <a href="#education">EDUCATION</a>
-    <a href="#experience">EXPERIENCE</a>
-    <a href="#skills">SKILLS</a>
-    <a href="#projects">PROJECTS</a>
-    <a href="#certs">CERTIFICATES</a>
-    <a href="#contact">CONTACT</a>
-  </nav>
+  <div class="nav-wrap">
+    <div class="nav-fade left" id="nav-fade-left" aria-hidden="true"></div>
+    <nav id="main-nav">
+      <a href="#objective">ABOUT</a>
+      <a href="#education">EDUCATION</a>
+      <a href="#experience">EXPERIENCE</a>
+      <a href="#skills">SKILLS</a>
+      <a href="#projects">PROJECTS</a>
+      <a href="#certs">CERTIFICATES</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+    <div class="nav-fade right visible" id="nav-fade-right" aria-hidden="true"></div>
+  </div>
   <button id="theme-btn" aria-label="Toggle day/night">🌙 NIGHT</button>
 </header>
 
 <!-- MAIN -->
 <main>
   <section class="hero">
-    <div class="hero-avatar" aria-hidden="true">🛡️</div>
+    <div class="hero-avatar"><img src="profile.jpg" alt="Jomer Antoniego Biason" loading="eager"></div>
     <div class="hero-text">
       <h1>JOMER BIASON</h1>
       <div class="subtitle">MIS Assistant · Software Developer · IT Support</div>
@@ -560,22 +621,22 @@ footer a { color: var(--link); }
       <div class="panel-title">SKILLS</div>
       <div style="margin-bottom:1rem;">
         <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:var(--border); margin-bottom:10px;">DEVELOPMENT</div>
-        <div class="skill-row"><span class="skill-name">HTML5 / CSS3</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
-        <div class="skill-row"><span class="skill-name">JavaScript</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
-        <div class="skill-row"><span class="skill-name">Apps Script / Excel</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
+        <div class="skill-row"><span class="skill-name">HTML5 / CSS3</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="100"></div></div><span class="skill-bar-pct">100%</span></div>
+        <div class="skill-row"><span class="skill-name">JavaScript</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="80"></div></div><span class="skill-bar-pct">80%</span></div>
+        <div class="skill-row"><span class="skill-name">Apps Script / Excel</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="80"></div></div><span class="skill-bar-pct">80%</span></div>
       </div>
       <div style="margin-bottom:1rem;">
         <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:var(--border); margin-bottom:10px;">DATABASE & IT</div>
-        <div class="skill-row"><span class="skill-name">System Troubleshooting</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
-        <div class="skill-row"><span class="skill-name">Hardware Maintenance</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
-        <div class="skill-row"><span class="skill-name">MongoDB / Airtable</span><div class="hearts">❤️❤️❤️🖤🖤</div></div>
-        <div class="skill-row"><span class="skill-name">Linux Bash / AWS</span><div class="hearts">❤️❤️❤️🖤🖤</div></div>
+        <div class="skill-row"><span class="skill-name">System Troubleshooting</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="100"></div></div><span class="skill-bar-pct">100%</span></div>
+        <div class="skill-row"><span class="skill-name">Hardware Maintenance</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="100"></div></div><span class="skill-bar-pct">100%</span></div>
+        <div class="skill-row"><span class="skill-name">MongoDB / Airtable</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="60"></div></div><span class="skill-bar-pct">60%</span></div>
+        <div class="skill-row"><span class="skill-name">Linux Bash / AWS</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="60"></div></div><span class="skill-bar-pct">60%</span></div>
       </div>
       <div>
         <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:var(--border); margin-bottom:10px;">OPERATIONS</div>
-        <div class="skill-row"><span class="skill-name">Inventory Management</span><div class="hearts">❤️❤️❤️❤️❤️</div></div>
-        <div class="skill-row"><span class="skill-name">Financial Reconciliation</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
-        <div class="skill-row"><span class="skill-name">SEO / Digital Marketing</span><div class="hearts">❤️❤️❤️❤️🖤</div></div>
+        <div class="skill-row"><span class="skill-name">Inventory Management</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="100"></div></div><span class="skill-bar-pct">100%</span></div>
+        <div class="skill-row"><span class="skill-name">Financial Reconciliation</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="80"></div></div><span class="skill-bar-pct">80%</span></div>
+        <div class="skill-row"><span class="skill-name">SEO / Digital Marketing</span><div class="skill-bar-track"><div class="skill-bar-fill" data-pct="80"></div></div><span class="skill-bar-pct">80%</span></div>
       </div>
     </div>
   </section>
@@ -611,39 +672,39 @@ footer a { color: var(--link); }
       <div class="panel-title">CERTIFICATIONS</div>
       <div class="cert-grid">
         <div class="cert-card">
-          <a href="certs/Technical Compliance Workshop by Credit Information Corporation.jpg" target="_blank">
+          <button type="button" class="cert-open" data-full="certs/Technical Compliance Workshop by Credit Information Corporation.jpg" data-caption="Technical Compliance — Credit Information Corporation" aria-label="View Technical Compliance certificate full size">
             <img src="certs/Technical Compliance Workshop by Credit Information Corporation.jpg" alt="Technical Compliance" loading="lazy">
-          </a>
+          </button>
           <p><strong>TECHNICAL COMPLIANCE</strong>Credit Information Corporation</p>
         </div>
         <div class="cert-card">
-          <a href="certs/Fundamentals of Digital Marketing Certification by Google Digital Garage.jpg" target="_blank">
+          <button type="button" class="cert-open" data-full="certs/Fundamentals of Digital Marketing Certification by Google Digital Garage.jpg" data-caption="Digital Marketing — Google Digital Garage" aria-label="View Digital Marketing certificate full size">
             <img src="certs/Fundamentals of Digital Marketing Certification by Google Digital Garage.jpg" alt="Digital Marketing" loading="lazy">
-          </a>
+          </button>
           <p><strong>DIGITAL MARKETING</strong>Google Digital Garage</p>
         </div>
         <div class="cert-card">
-          <a href="certs/Installing and Configuring Computer Systems Certification by TESDA.jpg" target="_blank">
+          <button type="button" class="cert-open" data-full="certs/Installing and Configuring Computer Systems Certification by TESDA.jpg" data-caption="Computer Systems — TESDA" aria-label="View Computer Systems certificate full size">
             <img src="certs/Installing and Configuring Computer Systems Certification by TESDA.jpg" alt="Computer Systems" loading="lazy">
-          </a>
+          </button>
           <p><strong>COMPUTER SYSTEMS</strong>TESDA</p>
         </div>
         <div class="cert-card">
-          <a href="certs/Search Engine Optimization Certification by HubSpot Academy.jpg" target="_blank">
+          <button type="button" class="cert-open" data-full="certs/Search Engine Optimization Certification by HubSpot Academy.jpg" data-caption="SEO Certification — HubSpot Academy" aria-label="View SEO certificate full size">
             <img src="certs/Search Engine Optimization Certification by HubSpot Academy.jpg" alt="SEO" loading="lazy">
-          </a>
+          </button>
           <p><strong>SEO CERTIFICATION</strong>HubSpot Academy</p>
         </div>
         <div class="cert-card">
-          <a href="certs/Inventory Management Certification by Hewlett-Packard.jpg" target="_blank">
+          <button type="button" class="cert-open" data-full="certs/Inventory Management Certification by Hewlett-Packard.jpg" data-caption="Inventory Management — Hewlett-Packard" aria-label="View Inventory Management certificate full size">
             <img src="certs/Inventory Management Certification by Hewlett-Packard.jpg" alt="Inventory Management" loading="lazy">
-          </a>
+          </button>
           <p><strong>INVENTORY MANAGEMENT</strong>Hewlett-Packard</p>
         </div>
         <div class="cert-card">
-          <a href="certs/REST API with Springboot Certification by CvSU Imus Campus.jpg" target="_blank">
+          <button type="button" class="cert-open" data-full="certs/REST API with Springboot Certification by CvSU Imus Campus.jpg" data-caption="REST API / Springboot — Cavite State University" aria-label="View REST API certificate full size">
             <img src="certs/REST API with Springboot Certification by CvSU Imus Campus.jpg" alt="REST API" loading="lazy">
-          </a>
+          </button>
           <p><strong>REST API / SPRINGBOOT</strong>Cavite State University</p>
         </div>
       </div>
@@ -690,6 +751,7 @@ footer a { color: var(--link); }
       </div>
       <div style="margin-top:1rem; display:flex; gap:8px; flex-wrap:wrap;">
         <a href="mailto:jomerbiason@gmail.com" class="btn-pixel">📧 EMAIL ME</a>
+        <button type="button" class="btn-pixel" id="copy-email-btn" data-email="jomerbiason@gmail.com">📋 COPY EMAIL</button>
         <a href="https://www.linkedin.com/in/jomer-biason-6731b3245/" target="_blank" class="btn-pixel">💼 LINKEDIN</a>
         <a href="JomerAntoniegoBiason_CurriculumVitae.pdf" download class="btn-pixel">📄 DOWNLOAD CV</a>
       </div>
@@ -700,6 +762,18 @@ footer a { color: var(--link); }
 <footer>
   <div>© 2026 JOMER ANTONIEGO BIASON · ALL RIGHTS RESERVED</div>
 </footer>
+
+<!-- CERTIFICATE LIGHTBOX -->
+<div id="cert-lightbox" class="lightbox" hidden>
+  <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
+  <figure>
+    <img id="lightbox-img" src="" alt="">
+    <figcaption id="lightbox-caption"></figcaption>
+  </figure>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 /* ══════════════════════════════════════════════
@@ -1948,6 +2022,121 @@ function debounce(fn, wait){
   placeLamps();
   window.addEventListener('resize', debounce(resize, 150));
   requestAnimationFrame(loop);
+})();
+
+/* ══════════════════════════════════════════════
+   CERTIFICATE LIGHTBOX
+══════════════════════════════════════════════ */
+(function(){
+  const lightbox = document.getElementById('cert-lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  const lbCaption = document.getElementById('lightbox-caption');
+  const closeBtn = document.getElementById('lightbox-close');
+  let lastFocused = null;
+
+  function open(btn){
+    lastFocused = document.activeElement;
+    lbImg.src = btn.getAttribute('data-full');
+    lbImg.alt = btn.getAttribute('data-caption') || '';
+    lbCaption.textContent = btn.getAttribute('data-caption') || '';
+    lightbox.hidden = false;
+    closeBtn.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  function close(){
+    lightbox.hidden = true;
+    lbImg.src = '';
+    document.body.style.overflow = '';
+    if(lastFocused) lastFocused.focus();
+  }
+
+  document.querySelectorAll('.cert-open').forEach(btn=>{
+    btn.addEventListener('click', ()=> open(btn));
+  });
+  closeBtn.addEventListener('click', close);
+  lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) close(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && !lightbox.hidden) close(); });
+})();
+
+/* ══════════════════════════════════════════════
+   COPY EMAIL + TOAST
+══════════════════════════════════════════════ */
+(function(){
+  const toastEl = document.getElementById('toast');
+  let toastTimer = null;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
+  }
+  const btn = document.getElementById('copy-email-btn');
+  if(btn){
+    btn.addEventListener('click', async ()=>{
+      const email = btn.getAttribute('data-email');
+      try{
+        if(navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(email);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = email; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        showToast('✔ EMAIL COPIED!');
+      } catch(err){
+        showToast('COPY FAILED — ' + email);
+      }
+    });
+  }
+})();
+
+/* ══════════════════════════════════════════════
+   SKILL BAR REVEAL
+══════════════════════════════════════════════ */
+(function(){
+  const bars = document.querySelectorAll('.skill-bar-fill');
+  if(!bars.length) return;
+  function reveal(fillEl){
+    const pct = fillEl.getAttribute('data-pct') || '0';
+    fillEl.style.width = pct + '%';
+  }
+  if(prefersReducedMotion){
+    bars.forEach(reveal);
+    return;
+  }
+  /* Observe the track (parent), not the fill itself — the fill starts at
+     width:0 (zero area), so an IntersectionObserver on it never reports
+     isIntersecting for any non-zero threshold. */
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const fillEl = e.target.querySelector('.skill-bar-fill');
+        if(fillEl) reveal(fillEl);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.skill-bar-track').forEach(track=> obs.observe(track));
+})();
+
+/* ══════════════════════════════════════════════
+   MOBILE NAV SCROLL HINT
+══════════════════════════════════════════════ */
+(function(){
+  const nav = document.getElementById('main-nav');
+  const fadeLeft = document.getElementById('nav-fade-left');
+  const fadeRight = document.getElementById('nav-fade-right');
+  if(!nav || !fadeLeft || !fadeRight) return;
+  function update(){
+    const max = nav.scrollWidth - nav.clientWidth;
+    fadeLeft.classList.toggle('visible', nav.scrollLeft > 4);
+    fadeRight.classList.toggle('visible', nav.scrollLeft < max - 4);
+  }
+  nav.addEventListener('scroll', update);
+  window.addEventListener('resize', debounce(update, 150));
+  update();
 })();
 </script>
 </body>
